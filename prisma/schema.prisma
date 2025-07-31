@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Workspace memberships
+  workspaceMemberships WorkspaceMember[]
+  
+  // Created items
+  workspaces Workspace[] @relation("WorkspaceCreator")
+  projects   Project[]   @relation("ProjectCreator")
+  prompts    Prompt[]    @relation("PromptCreator")
+  promptVersions PromptVersion[] @relation("PromptVersionCreator")
+  testRuns   TestRun[]   @relation("TestRunCreator")
+  abTests    ABTest[]    @relation("ABTestCreator")
+  abTestResults ABTestResult[] @relation("ABTestResultCreator")
+  datasets   Dataset[]   @relation("DatasetCreator")
+  notifications Notification[] @relation("NotificationCreator")
+
+  @@map("users")
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  creator     User     @relation("WorkspaceCreator", fields: [createdBy], references: [id])
+
+  // Settings
+  defaultModel        String   @default("gpt-3.5-turbo")
+  defaultTemperature  Float    @default(0.7)
+  maxTokens          Int      @default(4096)
+  allowedModels      String[] @default(["gpt-3.5-turbo", "gpt-4", "claude-3"])
+  costLimit          Float?
+  tokenLimit         Int?
+
+  // Relations
+  members WorkspaceMember[]
+  projects Project[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        Role   @default(MEMBER)
+  joinedAt    DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User     @relation("ProjectCreator", fields: [createdBy], references: [id])
+
+  // Relations
+  prompts  Prompt[]
+  datasets Dataset[]
+
+  @@map("projects")
+}
+
+model Prompt {
+  id              String   @id @default(cuid())
+  name            String
+  content         String
+  description     String?
+  projectId       String
+  version         Int      @default(1)
+  tags            String[]
+  model           String   @default("gpt-3.5-turbo")
+  temperature     Float    @default(0.7)
+  maxTokens       Int?
+  topP            Float?
+  frequencyPenalty Float?
+  presencePenalty  Float?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator User    @relation("PromptCreator", fields: [createdBy], references: [id])
+
+  // Relations
+  versions    PromptVersion[]
+  testRuns    TestRun[]
+  abTestsA    ABTest[] @relation("PromptA")
+  abTestsB    ABTest[] @relation("PromptB")
+
+  @@map("prompts")
+}
+
+model PromptVersion {
+  id          String   @id @default(cuid())
+  promptId    String
+  version     Int
+  content     String
+  description String?
+  changes     String[]
+  createdAt   DateTime @default(now())
+  createdBy   String
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  creator User  @relation("PromptVersionCreator", fields: [createdBy], references: [id])
+
+  @@unique([promptId, version])
+  @@map("prompt_versions")
+}
+
+model TestRun {
+  id            String   @id @default(cuid())
+  promptId      String
+  promptVersion Int
+  input         Json
+  output        String
+  model         String
+  tokensUsed    Int
+  cost          Float
+  latency       Int      // in milliseconds
+  rating        Int?
+  feedback      String?
+  createdAt     DateTime @default(now())
+  createdBy     String
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  creator User  @relation("TestRunCreator", fields: [createdBy], references: [id])
+
+  @@map("test_runs")
+}
+
+model ABTest {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  promptAId       String
+  promptBId       String
+  promptAVersion  Int
+  promptBVersion  Int
+  testInputs      String[]
+  status          ABTestStatus @default(DRAFT)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String
+
+  promptA Prompt @relation("PromptA", fields: [promptAId], references: [id])
+  promptB Prompt @relation("PromptB", fields: [promptBId], references: [id])
+  creator User   @relation("ABTestCreator", fields: [createdBy], references: [id])
+
+  // Relations
+  results ABTestResult[]
+
+  @@map("ab_tests")
+}
+
+model ABTestResult {
+  id        String   @id @default(cuid())
+  testId    String
+  input     String
+  outputA   String
+  outputB   String
+  winner    Winner?
+  ratingA   Int?
+  ratingB   Int?
+  feedback  String?
+  createdAt DateTime @default(now())
+  createdBy String
+
+  test   ABTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  creator User  @relation("ABTestResultCreator", fields: [createdBy], references: [id])
+
+  @@map("ab_test_results")
+}
+
+model Dataset {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  projectId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator User    @relation("DatasetCreator", fields: [createdBy], references: [id])
+
+  // Relations
+  items DatasetItem[]
+
+  @@map("datasets")
+}
+
+model DatasetItem {
+  id           String   @id @default(cuid())
+  datasetId    String
+  input        Json
+  expectedOutput String?
+  tags         String[]
+  createdAt    DateTime @default(now())
+
+  dataset Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@map("dataset_items")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  createdBy String
+
+  creator User @relation("NotificationCreator", fields: [createdBy], references: [id])
+
+  @@map("notifications")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum ABTestStatus {
+  DRAFT
+  RUNNING
+  COMPLETED
+}
+
+enum Winner {
+  A
+  B
+  TIE
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+} 
