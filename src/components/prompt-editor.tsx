@@ -36,11 +36,44 @@ export function PromptEditor({
     onSave?.(content)
   }
 
-  const handleTest = () => {
+  const handleTest = async () => {
+    if (!content.trim()) {
+      alert('Please enter some prompt content')
+      return
+    }
+
     setIsRunning(true)
-    onTest?.(content, variables)
-    // Simulate API call
-    setTimeout(() => setIsRunning(false), 2000)
+    try {
+      // For now, we'll simulate the API call since we need a prompt ID
+      // In a real implementation, this would call the actual LLM API
+      const response = await fetch('/api/prompts/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content,
+          variables,
+          model: 'gpt-3.5-turbo',
+          temperature: 0.7
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Test result:', result)
+        // You could display the result in a modal or toast
+        alert('Test completed! Check console for results.')
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Test failed')
+      }
+    } catch (error) {
+      console.error('Test error:', error)
+      alert('Test failed. Please try again.')
+    } finally {
+      setIsRunning(false)
+    }
   }
 
   const extractVariables = (text: string) => {

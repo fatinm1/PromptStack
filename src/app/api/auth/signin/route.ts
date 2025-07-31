@@ -1,31 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
+import prisma from '@/lib/db'
+
+const signinSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required')
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const body = await request.json()
+    const { email, password } = signinSchema.parse(body)
 
-    // Simple demo authentication - in a real app, you'd validate against database
-    if (email && password) {
-      // For demo purposes, accept any email/password combination
-      const user = {
-        id: 'demo-user-1',
-        name: email.split('@')[0] || 'Demo User',
-        email: email,
-        avatar: `https://avatars.githubusercontent.com/u/${Math.floor(Math.random() * 1000)}`
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        workspaceMemberships: {
+          include: {
+            workspace: true
+          }
+        }
       }
+    })
 
-      return NextResponse.json({ 
-        success: true, 
-        user,
-        message: 'Login successful' 
-      })
-    } else {
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: 'Email and password are required' },
+        { success: false, message: 'Invalid email or password' },
+        { status: 401 }
+      )
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password || '')
+
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid email or password' },
+        { status: 401 }
+      )
+    }
+
+    // Return user data (without password)
+    const { password: _, ...userWithoutPassword } = user
+
+    return NextResponse.json({ 
+      success: true, 
+      user: userWithoutPassword,
+      message: 'Login successful' 
+    })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, message: 'Validation failed', details: error.errors },
         { status: 400 }
       )
     }
-  } catch (error) {
+
+    console.error('Signin error:', error)
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

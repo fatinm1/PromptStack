@@ -24,9 +24,7 @@ export async function GET(request: NextRequest) {
       select: { workspaceId: true }
     })
 
-    const workspaceIds = workspaceId 
-      ? [workspaceId] 
-      : userWorkspaces.map(w => w.workspaceId)
+    const workspaceIds = userWorkspaces.map(w => w.workspaceId)
 
     // Build date filter
     const dateFilter: any = {}
@@ -37,6 +35,11 @@ export async function GET(request: NextRequest) {
       dateFilter.lte = new Date(endDate)
     }
 
+    // Build workspace filter
+    const workspaceFilter = workspaceId 
+      ? { workspaceId } 
+      : { workspaceId: { in: workspaceIds } }
+
     // Get analytics data
     const [
       totalPrompts,
@@ -44,6 +47,7 @@ export async function GET(request: NextRequest) {
       totalCost,
       totalTokens,
       averageLatency,
+      successRate,
       topModels,
       costByDate,
       tokenUsageByDate
@@ -51,10 +55,7 @@ export async function GET(request: NextRequest) {
       // Total prompts
       prisma.prompt.count({
         where: {
-          project: {
-            workspaceId: { in: workspaceIds }
-          },
-          isActive: true
+          project: workspaceFilter
         }
       }),
 
@@ -62,9 +63,7 @@ export async function GET(request: NextRequest) {
       prisma.testRun.count({
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
         }
@@ -74,54 +73,71 @@ export async function GET(request: NextRequest) {
       prisma.testRun.aggregate({
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
         },
-        _sum: { cost: true }
+        _sum: {
+          cost: true
+        }
       }),
 
       // Total tokens
       prisma.testRun.aggregate({
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
         },
-        _sum: { tokensUsed: true }
+        _sum: {
+          tokensUsed: true
+        }
       }),
 
       // Average latency
       prisma.testRun.aggregate({
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
         },
-        _avg: { latency: true }
+        _avg: {
+          latency: true
+        }
       }),
 
-      // Top models
+      // Success rate (test runs with rating >= 4)
+      prisma.testRun.count({
+        where: {
+          prompt: {
+            project: workspaceFilter
+          },
+          rating: {
+            gte: 4
+          },
+          ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
+        }
+      }),
+
+      // Top models by usage
       prisma.testRun.groupBy({
         by: ['model'],
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
         },
-        _count: { model: true },
-        orderBy: { _count: { model: 'desc' } },
+        _count: {
+          model: true
+        },
+        orderBy: {
+          _count: {
+            model: 'desc'
+          }
+        },
         take: 5
       }),
 
@@ -130,16 +146,18 @@ export async function GET(request: NextRequest) {
         by: ['createdAt'],
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           createdAt: {
             gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           }
         },
-        _sum: { cost: true },
-        orderBy: { createdAt: 'asc' }
+        _sum: {
+          cost: true
+        },
+        orderBy: {
+          createdAt: 'asc'
+        }
       }),
 
       // Token usage by date (last 30 days)
@@ -147,34 +165,36 @@ export async function GET(request: NextRequest) {
         by: ['createdAt'],
         where: {
           prompt: {
-            project: {
-              workspaceId: { in: workspaceIds }
-            }
+            project: workspaceFilter
           },
           createdAt: {
             gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           }
         },
-        _sum: { tokensUsed: true },
-        orderBy: { createdAt: 'asc' }
+        _sum: {
+          tokensUsed: true
+        },
+        orderBy: {
+          createdAt: 'asc'
+        }
       })
     ])
 
-    // Calculate success rate (test runs with ratings >= 4)
-    const successfulRuns = await prisma.testRun.count({
+    // Calculate success rate percentage
+    const totalRatedTests = await prisma.testRun.count({
       where: {
         prompt: {
-          project: {
-            workspaceId: { in: workspaceIds }
-          }
+          project: workspaceFilter
         },
-        rating: { gte: 4 },
+        rating: {
+          not: null
+        },
         ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter })
       }
     })
 
-    const successRate = totalTestRuns > 0 
-      ? (successfulRuns / totalTestRuns) * 100 
+    const successRatePercentage = totalRatedTests > 0 
+      ? (successRate / totalRatedTests) * 100 
       : 0
 
     return NextResponse.json({
@@ -183,18 +203,18 @@ export async function GET(request: NextRequest) {
       totalCost: totalCost._sum.cost || 0,
       totalTokens: totalTokens._sum.tokensUsed || 0,
       averageLatency: averageLatency._avg.latency || 0,
-      successRate,
-      topModels: topModels.map(m => ({
-        model: m.model,
-        usage: m._count.model
+      successRate: successRatePercentage,
+      topModels: topModels.map(model => ({
+        model: model.model,
+        usage: model._count.model
       })),
-      costByDate: costByDate.map(d => ({
-        date: d.createdAt.toISOString().split('T')[0],
-        cost: d._sum.cost || 0
+      costByDate: costByDate.map(item => ({
+        date: item.createdAt.toISOString().split('T')[0],
+        cost: item._sum.cost || 0
       })),
-      tokenUsageByDate: tokenUsageByDate.map(d => ({
-        date: d.createdAt.toISOString().split('T')[0],
-        tokens: d._sum.tokensUsed || 0
+      tokenUsageByDate: tokenUsageByDate.map(item => ({
+        date: item.createdAt.toISOString().split('T')[0],
+        tokens: item._sum.tokensUsed || 0
       }))
     })
   } catch (error) {

@@ -5,7 +5,7 @@ import prisma from '@/lib/db'
 import { authOptions } from '@/lib/auth'
 import { runPrompt } from '@/lib/llm'
 
-const testRunSchema = z.object({
+const testPromptSchema = z.object({
   input: z.record(z.any()),
   rating: z.number().min(1).max(5).optional(),
   feedback: z.string().optional()
@@ -25,7 +25,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { input, rating, feedback } = testRunSchema.parse(body)
+    const { input, rating, feedback } = testPromptSchema.parse(body)
 
     // Get the prompt
     const prompt = await prisma.prompt.findFirst({
@@ -43,58 +43,60 @@ export async function POST(
 
     if (!prompt) {
       return NextResponse.json(
-        { error: 'Prompt not found' },
+        { error: 'Prompt not found or access denied' },
         { status: 404 }
       )
     }
 
-    // Run the prompt
+    // Run the prompt with LLM
+    const startTime = Date.now()
     const llmResponse = await runPrompt({
       content: prompt.content,
       variables: input,
       model: prompt.model,
       temperature: prompt.temperature,
-      maxTokens: prompt.maxTokens,
-      topP: prompt.topP,
-      frequencyPenalty: prompt.frequencyPenalty,
-      presencePenalty: prompt.presencePenalty
+      maxTokens: prompt.maxTokens ?? undefined,
+      topP: prompt.topP ?? undefined,
+      frequencyPenalty: prompt.frequencyPenalty ?? undefined,
+      presencePenalty: prompt.presencePenalty ?? undefined
     })
+    const latency = Date.now() - startTime
 
-    // Save test run
+    // Save test run to database
     const testRun = await prisma.testRun.create({
       data: {
-        promptId: params.id,
+        promptId: prompt.id,
         promptVersion: prompt.version,
-        input,
+        input: input,
         output: llmResponse.content,
         model: llmResponse.model,
         tokensUsed: llmResponse.tokensUsed,
         cost: llmResponse.cost,
-        latency: llmResponse.latency,
-        rating,
-        feedback,
+        latency: latency,
+        rating: rating,
+        feedback: feedback,
         createdBy: session.user.id
       },
       include: {
         prompt: {
           select: {
             name: true,
-            project: {
-              select: {
-                name: true,
-                workspace: {
-                  select: { name: true }
-                }
-              }
-            }
+            content: true
           }
         }
       }
     })
 
     return NextResponse.json({
-      ...testRun,
-      llmResponse
+      success: true,
+      testRun,
+      llmResponse: {
+        content: llmResponse.content,
+        tokensUsed: llmResponse.tokensUsed,
+        cost: llmResponse.cost,
+        latency: latency,
+        model: llmResponse.model
+      }
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -104,7 +106,7 @@ export async function POST(
       )
     }
 
-    console.error('Test run error:', error)
+    console.error('Test prompt error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -146,7 +148,7 @@ export async function GET(
 
     if (!prompt) {
       return NextResponse.json(
-        { error: 'Prompt not found' },
+        { error: 'Prompt not found or access denied' },
         { status: 404 }
       )
     }
@@ -154,18 +156,16 @@ export async function GET(
     const [testRuns, total] = await Promise.all([
       prisma.testRun.findMany({
         where: { promptId: params.id },
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
         include: {
           creator: {
             select: { name: true, email: true }
           }
-        }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit
       }),
-      prisma.testRun.count({
-        where: { promptId: params.id }
-      })
+      prisma.testRun.count({ where: { promptId: params.id } })
     ])
 
     return NextResponse.json({
