@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -49,7 +49,7 @@ model Workspace {
   defaultModel        String   @default("gpt-3.5-turbo")
   defaultTemperature  Float    @default(0.7)
   maxTokens          Int      @default(4096)
-  allowedModels      String[] @default(["gpt-3.5-turbo", "gpt-4", "claude-3"])
+  allowedModels      String   @default("gpt-3.5-turbo,gpt-4,claude-3")
   costLimit          Float?
   tokenLimit         Int?
 
@@ -64,7 +64,7 @@ model WorkspaceMember {
   id          String @id @default(cuid())
   workspaceId String
   userId      String
-  role        Role   @default(MEMBER)
+  role        String @default("MEMBER")
   joinedAt    DateTime @default(now())
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -100,7 +100,7 @@ model Prompt {
   description     String?
   projectId       String
   version         Int      @default(1)
-  tags            String[]
+  tags            String   @default("")
   model           String   @default("gpt-3.5-turbo")
   temperature     Float    @default(0.7)
   maxTokens       Int?
@@ -130,7 +130,7 @@ model PromptVersion {
   version     Int
   content     String
   description String?
-  changes     String[]
+  changes     String   @default("")
   createdAt   DateTime @default(now())
   createdBy   String
 
@@ -145,7 +145,7 @@ model TestRun {
   id            String   @id @default(cuid())
   promptId      String
   promptVersion Int
-  input         Json
+  input         String   // JSON string
   output        String
   model         String
   tokensUsed    Int
@@ -170,8 +170,8 @@ model ABTest {
   promptBId       String
   promptAVersion  Int
   promptBVersion  Int
-  testInputs      String[]
-  status          ABTestStatus @default(DRAFT)
+  testInputs      String   // JSON string
+  status          String   @default("DRAFT")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   createdBy       String
@@ -192,7 +192,7 @@ model ABTestResult {
   input     String
   outputA   String
   outputB   String
-  winner    Winner?
+  winner    String?  // "A", "B", "TIE", or null
   ratingA   Int?
   ratingB   Int?
   feedback  String?
@@ -226,9 +226,9 @@ model Dataset {
 model DatasetItem {
   id           String   @id @default(cuid())
   datasetId    String
-  input        Json
+  input        String   // JSON string
   expectedOutput String?
-  tags         String[]
+  tags         String   @default("")
   createdAt    DateTime @default(now())
 
   dataset Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
@@ -237,40 +237,15 @@ model DatasetItem {
 }
 
 model Notification {
-  id        String           @id @default(cuid())
-  type      NotificationType
+  id        String   @id @default(cuid())
+  type      String   // "INFO", "SUCCESS", "WARNING", "ERROR"
   title     String
   message   String
-  read      Boolean          @default(false)
-  createdAt DateTime         @default(now())
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
   createdBy String
 
   creator User @relation("NotificationCreator", fields: [createdBy], references: [id])
 
   @@map("notifications")
-}
-
-enum Role {
-  ADMIN
-  MEMBER
-  VIEWER
-}
-
-enum ABTestStatus {
-  DRAFT
-  RUNNING
-  COMPLETED
-}
-
-enum Winner {
-  A
-  B
-  TIE
-}
-
-enum NotificationType {
-  INFO
-  SUCCESS
-  WARNING
-  ERROR
 } 
