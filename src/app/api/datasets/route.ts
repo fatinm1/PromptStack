@@ -2,32 +2,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import prisma from '@/lib/db'
 
-const createPromptSchema = z.object({
+const createDatasetSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  content: z.string().min(1, 'Content is required'),
   description: z.string().optional(),
   projectId: z.string().min(1, 'Project ID is required'),
-  tags: z.string().default(''),
-  model: z.string().default('gpt-3.5-turbo'),
-  temperature: z.number().min(0).max(2).default(0.7),
-  maxTokens: z.number().optional(),
-  topP: z.number().optional(),
-  frequencyPenalty: z.number().optional(),
-  presencePenalty: z.number().optional()
+  type: z.string().default('test'),
+  tags: z.string().default('')
 })
-
-const updatePromptSchema = createPromptSchema.partial()
 
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ prompts: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
+      return NextResponse.json({ datasets: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
     }
     const userId = authHeader.replace('Bearer ', '')
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
-      return NextResponse.json({ prompts: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
+      return NextResponse.json({ datasets: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
     }
 
     const { searchParams } = new URL(request.url)
@@ -60,12 +52,12 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
-        { tags: { hasSome: [search] } }
+        { tags: { contains: search, mode: 'insensitive' } }
       ]
     }
 
-    const [prompts, total] = await Promise.all([
-      prisma.prompt.findMany({
+    const [datasets, total] = await Promise.all([
+      prisma.dataset.findMany({
         where,
         include: {
           project: {
@@ -80,18 +72,18 @@ export async function GET(request: NextRequest) {
             select: { name: true, email: true }
           },
           _count: {
-            select: { testRuns: true }
+            select: { items: true }
           }
         },
         orderBy: { updatedAt: 'desc' },
         skip,
         take: limit
       }),
-      prisma.prompt.count({ where })
+      prisma.dataset.count({ where })
     ])
 
     return NextResponse.json({
-      prompts,
+      datasets,
       pagination: {
         page,
         limit,
@@ -100,7 +92,7 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Get prompts error:', error)
+    console.error('Get datasets error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -121,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const data = createPromptSchema.parse(body)
+    const data = createDatasetSchema.parse(body)
 
     // Verify user has access to the project
     const project = await prisma.project.findFirst({
@@ -142,7 +134,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const prompt = await prisma.prompt.create({
+    const dataset = await prisma.dataset.create({
       data: {
         ...data,
         createdBy: user.id
@@ -162,7 +154,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(prompt, { status: 201 })
+    return NextResponse.json(dataset, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -171,7 +163,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Create prompt error:', error)
+    console.error('Create dataset error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

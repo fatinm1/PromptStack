@@ -29,11 +29,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check if user is logged in on mount
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/session')
-        if (response.ok) {
-          const session = await response.json()
-          if (session.user) {
-            setUser(session.user)
+        // Get user ID from localStorage (simple session management)
+        const userId = localStorage.getItem('userId')
+        
+        if (userId) {
+          const response = await fetch('/api/auth/session', {
+            headers: {
+              'Authorization': `Bearer ${userId}`
+            }
+          })
+          if (response.ok) {
+            const session = await response.json()
+            if (session.user) {
+              setUser(session.user)
+            }
           }
         }
       } catch (error) {
@@ -58,6 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json()
         setUser(data.user)
+        // Store user ID in localStorage for session management
+        localStorage.setItem('userId', data.user.id)
       } else {
         throw new Error('Login failed')
       }
@@ -90,6 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null)
+    localStorage.removeItem('userId')
     // In a real app, you'd call the logout API
   }
 

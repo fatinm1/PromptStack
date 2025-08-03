@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import prisma from '@/lib/db'
-import { authOptions } from '@/lib/auth'
 
 const createProjectSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -14,12 +12,22 @@ const updateProjectSchema = createProjectSchema.partial()
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    // Get the user ID from the Authorization header
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ projects: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
+    }
+
+    const userId = authHeader.replace('Bearer ', '')
+    
+    // Verify the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    })
+
+    if (!user) {
+      return NextResponse.json({ projects: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
     }
 
     const { searchParams } = new URL(request.url)
@@ -29,9 +37,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const skip = (page - 1) * limit
 
-    // Get user's workspaces
+    // Get the user's workspaces
     const userWorkspaces = await prisma.workspaceMember.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { workspaceId: true }
     })
 
@@ -94,11 +102,27 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    // Get the user ID from the Authorization header
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    const userId = authHeader.replace('Bearer ', '')
+    
+    // Verify the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
       )
     }
 
@@ -110,7 +134,7 @@ export async function POST(request: NextRequest) {
       where: {
         id: data.workspaceId,
         members: {
-          some: { userId: session.user.id }
+          some: { userId: user.id }
         }
       }
     })
@@ -125,7 +149,7 @@ export async function POST(request: NextRequest) {
     const project = await prisma.project.create({
       data: {
         ...data,
-        createdBy: session.user.id
+        createdBy: user.id
       },
       include: {
         workspace: {

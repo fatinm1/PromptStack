@@ -53,9 +53,29 @@ export default function TeamPage() {
   const fetchTeamMembers = async () => {
     try {
       setLoading(true)
-      // Mock data for now
-      // For new users, start with empty team
-      setMembers([])
+      
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch('/api/team', { headers })
+      if (response.ok) {
+        const data = await response.json()
+        // Transform the data to match the interface
+        const transformedMembers = data.members.map((member: any) => ({
+          id: member.user.id,
+          name: member.user.name,
+          email: member.user.email,
+          avatar: member.user.avatar || '',
+          role: member.role as 'ADMIN' | 'MEMBER' | 'VIEWER',
+          status: 'active' as const,
+          joinedAt: member.joinedAt,
+          lastActive: new Date().toISOString(),
+          projects: 0,
+          prompts: 0
+        }))
+        setMembers(transformedMembers)
+      }
     } catch (error) {
       console.error('Error fetching team members:', error)
     } finally {

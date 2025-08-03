@@ -50,9 +50,28 @@ export default function DatasetsPage() {
   const fetchDatasets = async () => {
     try {
       setLoading(true)
-      // Mock data for now
-      // For new users, start with empty datasets
-      setDatasets([])
+      
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch('/api/datasets', { headers })
+      if (response.ok) {
+        const data = await response.json()
+        // Transform the data to match the interface
+        const transformedDatasets = (data.datasets || []).map((dataset: any) => ({
+          id: dataset.id,
+          name: dataset.name,
+          description: dataset.description || '',
+          itemCount: dataset._count?.items || 0,
+          createdAt: dataset.createdAt,
+          updatedAt: dataset.updatedAt,
+          tags: [], // Datasets don't have tags in the schema
+          projectId: dataset.projectId,
+          projectName: dataset.project?.name || 'Unknown Project'
+        }))
+        setDatasets(transformedDatasets)
+      }
     } catch (error) {
       console.error('Error fetching datasets:', error)
     } finally {
@@ -230,16 +249,18 @@ export default function DatasetsPage() {
                       {new Date(dataset.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                    {dataset.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-muted text-xs rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  {dataset.tags && dataset.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {dataset.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-1 bg-muted text-xs rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

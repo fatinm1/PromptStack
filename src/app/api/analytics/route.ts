@@ -1,15 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import prisma from '@/lib/db'
-import { authOptions } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    // Get the user ID from the Authorization header
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    const userId = authHeader.replace('Bearer ', '')
+    
+    // Verify the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
       )
     }
 
@@ -20,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's workspaces
     const userWorkspaces = await prisma.workspaceMember.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { workspaceId: true }
     })
 

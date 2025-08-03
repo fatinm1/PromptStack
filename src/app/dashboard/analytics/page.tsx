@@ -57,7 +57,12 @@ export default function AnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/analytics?range=${timeRange}`)
+      
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch(`/api/analytics?range=${timeRange}`, { headers })
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data)

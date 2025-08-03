@@ -52,9 +52,14 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
+      
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
       const [projectsRes, analyticsRes] = await Promise.all([
-        fetch('/api/projects'),
-        fetch('/api/analytics')
+        fetch('/api/projects', { headers }),
+        fetch('/api/analytics', { headers })
       ])
 
       if (projectsRes.ok) {

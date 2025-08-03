@@ -16,16 +16,40 @@ import {
   MoreVertical
 } from 'lucide-react'
 
-const mockPrompts: any[] = []
-
 export default function PromptsPage() {
+  const [prompts, setPrompts] = React.useState<any[]>([])
+  const [loading, setLoading] = React.useState(true)
   const [searchQuery, setSearchQuery] = React.useState('')
   const [selectedPrompt, setSelectedPrompt] = React.useState<string | null>(null)
 
-  const filteredPrompts = mockPrompts.filter(prompt =>
+  React.useEffect(() => {
+    const fetchPrompts = async () => {
+      try {
+        setLoading(true)
+        
+        // Get user ID from localStorage
+        const userId = localStorage.getItem('userId')
+        const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+        
+        const response = await fetch('/api/prompts', { headers })
+        if (response.ok) {
+          const data = await response.json()
+          setPrompts(data.prompts || [])
+        }
+      } catch (error) {
+        console.error('Error fetching prompts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPrompts()
+  }, [])
+
+  const filteredPrompts = prompts.filter(prompt =>
     prompt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    prompt.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    prompt.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (prompt.tags && prompt.tags.split(',').some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   )
 
   return (
@@ -55,8 +79,21 @@ export default function PromptsPage() {
         />
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <Card className="text-center py-16">
+          <CardContent>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <Code className="w-8 h-8 text-muted-foreground animate-spin" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3">Loading prompts...</h3>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Prompts Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {!loading && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredPrompts.map((prompt) => (
           <Card 
             key={prompt.id} 
@@ -82,16 +119,18 @@ export default function PromptsPage() {
             <CardContent>
               <div className="space-y-4">
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {prompt.tags.map((tag: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-muted text-xs rounded-md"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                {prompt.tags && (
+                  <div className="flex flex-wrap gap-1">
+                    {prompt.tags.split(',').map((tag: string, index: number) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-muted text-xs rounded-md"
+                      >
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -123,9 +162,10 @@ export default function PromptsPage() {
           </Card>
         ))}
       </div>
+      )}
 
       {/* Empty State */}
-      {filteredPrompts.length === 0 && (
+      {!loading && filteredPrompts.length === 0 && (
         <Card className="text-center py-16 border-dashed border-2 border-muted-foreground/20">
           <CardContent>
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
@@ -152,7 +192,7 @@ export default function PromptsPage() {
           <div className="bg-card border rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <PromptEditor
-                initialContent={mockPrompts.find(p => p.id === selectedPrompt)?.content || ''}
+                initialContent={prompts.find((p: any) => p.id === selectedPrompt)?.content || ''}
                 onSave={(content) => {
                   console.log('Saving prompt:', content)
                   setSelectedPrompt(null)

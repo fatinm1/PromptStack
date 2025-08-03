@@ -16,12 +16,36 @@ import {
   Clock
 } from 'lucide-react'
 
-const mockABTests: any[] = []
-
 export default function ABTestingPage() {
+  const [abTests, setAbTests] = React.useState<any[]>([])
+  const [loading, setLoading] = React.useState(true)
   const [selectedTest, setSelectedTest] = React.useState<string | null>(null)
   const [testInput, setTestInput] = React.useState('')
   const [isRunning, setIsRunning] = React.useState(false)
+
+  React.useEffect(() => {
+    const fetchABTests = async () => {
+      try {
+        setLoading(true)
+        
+        // Get user ID from localStorage
+        const userId = localStorage.getItem('userId')
+        const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+        
+        const response = await fetch('/api/ab-tests', { headers })
+        if (response.ok) {
+          const data = await response.json()
+          setAbTests(data.abTests || [])
+        }
+      } catch (error) {
+        console.error('Error fetching A/B tests:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchABTests()
+  }, [])
 
   const handleRunTest = () => {
     setIsRunning(true)
@@ -45,8 +69,20 @@ export default function ABTestingPage() {
         </Button>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <Card className="text-center py-16">
+          <CardContent>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <BarChart3 className="w-8 h-8 text-muted-foreground animate-spin" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3">Loading A/B tests...</h3>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Empty State */}
-      {mockABTests.length === 0 && (
+      {!loading && abTests.length === 0 && (
         <Card className="text-center py-16 border-dashed border-2 border-muted-foreground/20">
           <CardContent>
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
@@ -65,9 +101,9 @@ export default function ABTestingPage() {
       )}
 
       {/* Active Tests */}
-      {mockABTests.length > 0 && (
+      {!loading && abTests.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2">
-          {mockABTests.map((test) => (
+          {abTests.map((test: any) => (
             <Card key={test.id} className="card-hover">
               <CardHeader>
                 <div className="flex items-start justify-between">
