@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/auth-provider'
 import { cn } from '@/lib/utils'
-import { 
+import {
   Code,
   ChevronLeft,
   ChevronRight,
@@ -64,10 +64,12 @@ export function Sidebar() {
   
   // Add error handling for useAuth
   let user = null
+  let isHydrated = false
   
   try {
     const auth = useAuth()
     user = auth.user
+    isHydrated = auth.isHydrated
   } catch (error) {
     console.warn('Auth context not available:', error)
   }
@@ -151,15 +153,15 @@ export function Sidebar() {
           <div className="flex items-center space-x-2">
             <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
               <span className="text-xs font-medium">
-                {user ? getUserInitials(user.name) : 'U'}
+                {isHydrated && user ? getUserInitials(user.name) : 'U'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
-                {user ? user.name : 'User'}
+                {isHydrated && user ? user.name : 'User'}
               </p>
               <p className="text-xs text-muted-foreground truncate">
-                {user ? user.email : 'user@example.com'}
+                {isHydrated && user ? user.email : 'user@example.com'}
               </p>
             </div>
           </div>

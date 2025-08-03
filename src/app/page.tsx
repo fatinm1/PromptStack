@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { TypingAnimation } from '@/components/typing-animation'
 import { AdvancedTypingAnimation } from '@/components/advanced-typing-animation'
+import { ClientOnly } from '@/components/client-only'
 import { 
   GitBranch, 
   Code, 
@@ -28,7 +29,8 @@ import {
   GitPullRequest,
   Activity,
   Target,
-  Lightbulb
+  Lightbulb,
+  MessageSquare
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
@@ -72,21 +74,33 @@ function StatsSection() {
   ])
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
-      {stats.map((stat, index) => (
-        <div
-          key={stat.label}
-          className="text-center animate-fade-in"
-          style={{ animationDelay: `${index * 0.1}s` }}
-        >
-          <div className="flex justify-center mb-2">
-            <stat.icon className="w-6 h-6 text-promptstack-primary" />
+    <ClientOnly fallback={
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="text-center">
+            <div className="h-6 w-6 bg-muted rounded mx-auto mb-2"></div>
+            <div className="h-8 bg-muted rounded w-16 mx-auto mb-1"></div>
+            <div className="h-4 bg-muted rounded w-20 mx-auto"></div>
           </div>
-          <div className="text-2xl font-bold gradient-text">{stat.value}</div>
-          <div className="text-sm text-muted-foreground">{stat.label}</div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    }>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+        {stats.map((stat, index) => (
+          <div
+            key={stat.label}
+            className="text-center animate-fade-in"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <div className="flex justify-center mb-2">
+              <stat.icon className="w-6 h-6 text-promptstack-primary" />
+            </div>
+            <div className="text-2xl font-bold gradient-text">{stat.value}</div>
+            <div className="text-sm text-muted-foreground">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </ClientOnly>
   )
 }
 
@@ -100,64 +114,72 @@ function DemoPreview() {
   ]
 
   return (
-    <div className="relative mt-16 p-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50">
-      <div className="flex space-x-1 mb-4">
-        {demoTabs.map((tab, index) => (
-          <button
-            key={tab.name}
-            onClick={() => setActiveTab(index)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-              activeTab === index 
-                ? 'bg-promptstack-primary text-white' 
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <tab.icon className="w-4 h-4" />
-            <span className="text-sm font-medium">{tab.name}</span>
-          </button>
-        ))}
+    <ClientOnly fallback={
+      <div className="relative mt-16 p-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50">
+        <div className="h-64 bg-background/80 rounded-lg border border-border/50 p-4 flex items-center justify-center">
+          <div className="text-muted-foreground">Loading demo...</div>
+        </div>
       </div>
-      
-      <div className="h-64 bg-background/80 rounded-lg border border-border/50 p-4">
-        <div className="flex items-center space-x-2 mb-3">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+    }>
+      <div className="relative mt-16 p-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50">
+        <div className="flex space-x-1 mb-4">
+          {demoTabs.map((tab, index) => (
+            <button
+              key={tab.name}
+              onClick={() => setActiveTab(index)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                activeTab === index 
+                  ? 'bg-promptstack-primary text-white' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              <span className="text-sm font-medium">{tab.name}</span>
+            </button>
+          ))}
         </div>
         
-        {activeTab === 0 && (
-          <div className="space-y-2">
-            <div className="h-4 bg-muted rounded w-3/4"></div>
-            <div className="h-4 bg-muted rounded w-1/2"></div>
-            <div className="h-4 bg-muted rounded w-5/6"></div>
-            <div className="h-4 bg-muted rounded w-2/3"></div>
+        <div className="h-64 bg-background/80 rounded-lg border border-border/50 p-4">
+          <div className="flex items-center space-x-2 mb-3">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           </div>
-        )}
-        
-        {activeTab === 1 && (
-          <div className="grid grid-cols-2 gap-4">
+          
+          {activeTab === 0 && (
             <div className="space-y-2">
-              <div className="h-3 bg-green-200 rounded w-full"></div>
-              <div className="h-3 bg-green-200 rounded w-3/4"></div>
-              <div className="h-3 bg-green-200 rounded w-5/6"></div>
+              <div className="h-4 bg-muted rounded w-3/4"></div>
+              <div className="h-4 bg-muted rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-5/6"></div>
+              <div className="h-4 bg-muted rounded w-2/3"></div>
             </div>
-            <div className="space-y-2">
-              <div className="h-3 bg-blue-200 rounded w-full"></div>
-              <div className="h-3 bg-blue-200 rounded w-2/3"></div>
-              <div className="h-3 bg-blue-200 rounded w-4/5"></div>
+          )}
+          
+          {activeTab === 1 && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="h-3 bg-green-200 rounded w-full"></div>
+                <div className="h-3 bg-green-200 rounded w-3/4"></div>
+                <div className="h-3 bg-green-200 rounded w-5/6"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 bg-blue-200 rounded w-full"></div>
+                <div className="h-3 bg-blue-200 rounded w-2/3"></div>
+                <div className="h-3 bg-blue-200 rounded w-4/5"></div>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {activeTab === 2 && (
-          <div className="space-y-4">
-            <div className="h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded"></div>
-            <div className="h-8 bg-gradient-to-r from-promptstack-secondary to-promptstack-primary rounded"></div>
-            <div className="h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded"></div>
-          </div>
-        )}
+          )}
+          
+          {activeTab === 2 && (
+            <div className="space-y-4">
+              <div className="h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded"></div>
+              <div className="h-8 bg-gradient-to-r from-promptstack-secondary to-promptstack-primary rounded"></div>
+              <div className="h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded"></div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ClientOnly>
   )
 }
 
@@ -189,9 +211,13 @@ export default function HomePage() {
 
   const handlePricing = () => {
     // Scroll to pricing section or show pricing modal
-    const pricingSection = document.getElementById('pricing')
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth' })
+    if (typeof window !== 'undefined') {
+      const pricingSection = document.getElementById('pricing')
+      if (pricingSection) {
+        pricingSection.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        alert('Pricing information coming soon!')
+      }
     } else {
       alert('Pricing information coming soon!')
     }
@@ -203,9 +229,21 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <AnimatedGradient />
-      <FloatingParticles />
+    <ClientOnly fallback={
+      <div className="min-h-screen relative overflow-hidden">
+        <AnimatedGradient />
+        <FloatingParticles />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <div className="min-h-screen relative overflow-hidden">
+        <AnimatedGradient />
+        <FloatingParticles />
       
       {/* Header */}
       <header className="relative border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
@@ -220,7 +258,9 @@ export default function HomePage() {
             <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Features</a>
             <button onClick={handlePricing} className="text-sm font-medium hover:text-primary transition-colors">Pricing</button>
             <button onClick={handleDocs} className="text-sm font-medium hover:text-primary transition-colors">Docs</button>
-            <ThemeToggle />
+            <ClientOnly>
+              <ThemeToggle />
+            </ClientOnly>
             <Button variant="outline" size="sm" onClick={handleSignIn}>Sign In</Button>
             <Button size="sm" onClick={handleGetStarted} className="group">
               Get Started
@@ -253,15 +293,17 @@ export default function HomePage() {
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto animate-fade-in leading-relaxed" style={{ animationDelay: '0.2s' }}>
-            <AdvancedTypingAnimation 
-              lines={[
-                "Collaborate, version control, and test your LLM prompts with the power of Git-like workflows.",
-                "Build better AI applications together with enterprise-grade tools and analytics."
-              ]}
-              speed={50}
-              delay={2000}
-              className="text-xl md:text-2xl text-muted-foreground"
-            />
+            <ClientOnly>
+              <AdvancedTypingAnimation 
+                lines={[
+                  "Collaborate, version control, and test your LLM prompts with the power of Git-like workflows.",
+                  "Build better AI applications together with enterprise-grade tools and analytics."
+                ]}
+                speed={50}
+                delay={2000}
+                className="text-xl md:text-2xl text-muted-foreground"
+              />
+            </ClientOnly>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
@@ -699,96 +741,101 @@ export default function HomePage() {
       </section>
 
       {/* Customer Testimonials */}
-      <section className="py-20 bg-gradient-to-br from-card to-card/50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
-              What Our Users Say
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of developers and teams already using PromptStack
-            </p>
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
+            <Users className="w-4 h-4 text-promptstack-primary" />
+            <span className="text-sm font-medium text-promptstack-primary">Customer Stories</span>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">S</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Sarah Chen</h4>
-                    <p className="text-sm text-muted-foreground">AI Engineer, TechCorp</p>
-                  </div>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+            What Users Say
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Join thousands of developers and teams already using PromptStack
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <Card className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+            <CardContent className="p-6 relative">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-semibold">S</span>
                 </div>
-                <p className="text-muted-foreground mb-4">
-                  "PromptStack has revolutionized how our team manages AI prompts. The version control and A/B testing features are game-changers."
-                </p>
-                <div className="flex items-center">
-                  <div className="flex text-yellow-400">
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-lg">Sarah Chen</h4>
+                  <p className="text-sm text-muted-foreground">AI Engineer, TechCorp</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                "PromptStack has revolutionized how our team manages AI prompts. The version control and A/B testing features are game-changers."
+              </p>
+              <div className="flex items-center">
+                <div className="flex text-yellow-400">
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">M</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Mike Rodriguez</h4>
-                    <p className="text-sm text-muted-foreground">Lead Developer, AI Labs</p>
-                  </div>
+          <Card className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-blue-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+            <CardContent className="p-6 relative">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-semibold">M</span>
                 </div>
-                <p className="text-muted-foreground mb-4">
-                  "The collaborative features are incredible. Our team can now work together on prompts in real-time, just like Google Docs."
-                </p>
-                <div className="flex items-center">
-                  <div className="flex text-yellow-400">
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-lg">Mike Rodriguez</h4>
+                  <p className="text-sm text-muted-foreground">Lead Developer, AI Labs</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                "The collaborative features are incredible. Our team can now work together on prompts in real-time, just like Google Docs."
+              </p>
+              <div className="flex items-center">
+                <div className="flex text-yellow-400">
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-white font-semibold">A</span>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">Alex Thompson</h4>
-                    <p className="text-sm text-muted-foreground">CTO, DataFlow</p>
-                  </div>
+          <Card className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+            <CardContent className="p-6 relative">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-semibold">A</span>
                 </div>
-                <p className="text-muted-foreground mb-4">
-                  "The analytics dashboard helps us optimize costs and performance. We've reduced our AI costs by 40% since switching."
-                </p>
-                <div className="flex items-center">
-                  <div className="flex text-yellow-400">
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-lg">Alex Thompson</h4>
+                  <p className="text-sm text-muted-foreground">CTO, DataFlow</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+              <p className="text-muted-foreground mb-4">
+                "The analytics dashboard helps us optimize costs and performance. We've reduced our AI costs by 40% since switching."
+              </p>
+              <div className="flex items-center">
+                <div className="flex text-yellow-400">
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -920,80 +967,57 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know about PromptStack
-            </p>
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
+            <MessageSquare className="w-4 h-4 text-promptstack-primary" />
+            <span className="text-sm font-medium text-promptstack-primary">Common Questions</span>
           </div>
-          
-          <div className="max-w-4xl mx-auto space-y-6">
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3">How is PromptStack different from regular code repositories?</h3>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Everything you need to know about PromptStack
+          </p>
+        </div>
+        
+        <div className="max-w-4xl mx-auto space-y-6">
+          {[
+            {
+              question: "How is PromptStack different from regular code repositories?",
+              answer: "PromptStack is specifically designed for prompt engineering workflows. It includes built-in A/B testing, real-time collaboration, cost tracking, and integration with multiple AI models - features that generic code repositories don't provide."
+            },
+            {
+              question: "Which AI models does PromptStack support?",
+              answer: "We support all major AI models including GPT-4, GPT-3.5-turbo, Claude-3, Claude-2, and more. You can easily switch between models and compare their performance side-by-side."
+            },
+            {
+              question: "Can I use PromptStack with my existing AI infrastructure?",
+              answer: "Yes! PromptStack integrates seamlessly with your existing AI infrastructure. You can connect your own API keys and continue using your preferred AI models while gaining our collaboration and testing features."
+            },
+            {
+              question: "How does the A/B testing work?",
+              answer: "Our A/B testing feature allows you to test multiple prompt versions against the same dataset. We automatically evaluate responses for accuracy, relevance, and cost-effectiveness, then recommend the best performing version."
+            },
+            {
+              question: "Is my data secure?",
+              answer: "Absolutely. We use enterprise-grade security with end-to-end encryption, SOC 2 compliance, and never store your actual AI responses. Your prompts and data remain private and secure."
+            },
+            {
+              question: "Can I cancel my subscription anytime?",
+              answer: "Yes, you can cancel your subscription at any time. Your data will be preserved for 30 days, and you can export all your prompts and test results before cancellation."
+            }
+          ].map((faq, index) => (
+            <Card key={index} className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-promptstack-primary to-promptstack-secondary opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+              <CardContent className="p-6 relative">
+                <h3 className="font-semibold text-lg mb-3">{faq.question}</h3>
                 <p className="text-muted-foreground">
-                  PromptStack is specifically designed for prompt engineering workflows. It includes built-in A/B testing, 
-                  real-time collaboration, cost tracking, and integration with multiple AI models - features that generic 
-                  code repositories don't provide.
+                  {faq.answer}
                 </p>
               </CardContent>
             </Card>
-
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3">Which AI models does PromptStack support?</h3>
-                <p className="text-muted-foreground">
-                  We support all major AI models including GPT-4, GPT-3.5-turbo, Claude-3, Claude-2, and more. 
-                  You can easily switch between models and compare their performance side-by-side.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3">Can I use PromptStack with my existing AI infrastructure?</h3>
-                <p className="text-muted-foreground">
-                  Yes! PromptStack integrates seamlessly with your existing AI infrastructure. You can connect your 
-                  own API keys and continue using your preferred AI models while gaining our collaboration and testing features.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3">How does the A/B testing work?</h3>
-                <p className="text-muted-foreground">
-                  Our A/B testing feature allows you to test multiple prompt versions against the same dataset. 
-                  We automatically evaluate responses for accuracy, relevance, and cost-effectiveness, then 
-                  recommend the best performing version.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3">Is my data secure?</h3>
-                <p className="text-muted-foreground">
-                  Absolutely. We use enterprise-grade security with end-to-end encryption, SOC 2 compliance, 
-                  and never store your actual AI responses. Your prompts and data remain private and secure.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-3">Can I cancel my subscription anytime?</h3>
-                <p className="text-muted-foreground">
-                  Yes, you can cancel your subscription at any time. Your data will be preserved for 30 days, 
-                  and you can export all your prompts and test results before cancellation.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -1027,29 +1051,39 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-20 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">
-              Stay Updated
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Get the latest updates on prompt engineering, AI development, and new PromptStack features
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input 
-                type="email" 
-                placeholder="Enter your email" 
-                className="flex-1"
-              />
-              <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90">
-                Subscribe
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              No spam, unsubscribe at any time. We respect your privacy.
-            </p>
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
+            <MessageSquare className="w-4 h-4 text-promptstack-primary" />
+            <span className="text-sm font-medium text-promptstack-primary">Newsletter</span>
           </div>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+            Stay Updated
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Get the latest updates on prompt engineering, AI development, and new PromptStack features
+          </p>
+        </div>
+        
+        <div className="max-w-md mx-auto">
+          <Card className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-br from-promptstack-primary to-promptstack-secondary opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+            <CardContent className="p-6 relative">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="flex-1"
+                />
+                <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90">
+                  Subscribe
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground mt-4 text-center">
+                No spam, unsubscribe at any time. We respect your privacy.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
@@ -1072,5 +1106,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </ClientOnly>
   )
 } 
