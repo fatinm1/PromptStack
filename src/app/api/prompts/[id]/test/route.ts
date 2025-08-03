@@ -6,9 +6,8 @@ import { authOptions } from '@/lib/auth'
 import { runPrompt } from '@/lib/llm'
 
 const testPromptSchema = z.object({
-  input: z.record(z.any()),
-  rating: z.number().min(1).max(5).optional(),
-  feedback: z.string().optional()
+  input: z.string().min(1, 'Input is required'),
+  variables: z.record(z.any()).default({})
 })
 
 export async function POST(
@@ -25,7 +24,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { input, rating, feedback } = testPromptSchema.parse(body)
+    const { input, variables } = testPromptSchema.parse(body)
 
     // Get the prompt
     const prompt = await prisma.prompt.findFirst({
@@ -43,60 +42,41 @@ export async function POST(
 
     if (!prompt) {
       return NextResponse.json(
-        { error: 'Prompt not found or access denied' },
+        { error: 'Prompt not found' },
         { status: 404 }
       )
     }
 
-    // Run the prompt with LLM
-    const startTime = Date.now()
-    const llmResponse = await runPrompt({
+    // Run the prompt
+    const result = await runPrompt({
       content: prompt.content,
-      variables: input,
+      variables: { ...variables, input },
       model: prompt.model,
       temperature: prompt.temperature,
-      maxTokens: prompt.maxTokens ?? undefined,
-      topP: prompt.topP ?? undefined,
-      frequencyPenalty: prompt.frequencyPenalty ?? undefined,
-      presencePenalty: prompt.presencePenalty ?? undefined
+      maxTokens: prompt.maxTokens || undefined,
+      topP: prompt.topP || undefined,
+      frequencyPenalty: prompt.frequencyPenalty || undefined,
+      presencePenalty: prompt.presencePenalty || undefined
     })
-    const latency = Date.now() - startTime
 
-    // Save test run to database
+    // Save the test run
     const testRun = await prisma.testRun.create({
       data: {
-        promptId: prompt.id,
+        promptId: params.id,
         promptVersion: prompt.version,
-        input: input,
-        output: llmResponse.content,
-        model: llmResponse.model,
-        tokensUsed: llmResponse.tokensUsed,
-        cost: llmResponse.cost,
-        latency: latency,
-        rating: rating,
-        feedback: feedback,
+        input,
+        output: result.content,
+        tokensUsed: result.tokensUsed,
+        cost: result.cost,
+        latency: result.latency,
+        model: result.model,
         createdBy: session.user.id
-      },
-      include: {
-        prompt: {
-          select: {
-            name: true,
-            content: true
-          }
-        }
       }
     })
 
     return NextResponse.json({
-      success: true,
-      testRun,
-      llmResponse: {
-        content: llmResponse.content,
-        tokensUsed: llmResponse.tokensUsed,
-        cost: llmResponse.cost,
-        latency: latency,
-        model: llmResponse.model
-      }
+      ...result,
+      testRunId: testRun.id
     })
   } catch (error) {
     if (error instanceof z.ZodError) {

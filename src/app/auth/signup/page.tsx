@@ -25,7 +25,8 @@ export default function SignUpPage() {
       await signup(name, email, password)
       router.push('/dashboard')
     } catch (error) {
-      alert('Signup failed. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Signup failed. Please try again.'
+      alert(errorMessage)
     } finally {
       setIsLoading(false)
     }

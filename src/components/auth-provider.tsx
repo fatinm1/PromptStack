@@ -72,11 +72,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ name, email, password })
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        const data = await response.json()
         setUser(data.user)
       } else {
-        throw new Error('Signup failed')
+        throw new Error(data.message || 'Signup failed')
       }
     } catch (error) {
       console.error('Signup error:', error)

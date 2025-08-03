@@ -3,27 +3,28 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/components/auth-provider'
+import { cn } from '@/lib/utils'
 import { 
-  LayoutDashboard, 
-  Code, 
-  GitBranch, 
-  BarChart3, 
-  Database, 
-  Settings, 
-  Users, 
+  Code,
   ChevronLeft,
   ChevronRight,
   Plus,
-  FolderOpen
+  FolderOpen,
+  BarChart3,
+  GitBranch,
+  Target,
+  Database,
+  Users,
+  Settings
 } from 'lucide-react'
 
 const navigation = [
   {
     name: 'Dashboard',
     href: '/dashboard',
-    icon: LayoutDashboard,
+    icon: BarChart3,
   },
   {
     name: 'Prompts',
@@ -31,14 +32,14 @@ const navigation = [
     icon: Code,
   },
   {
-    name: 'Version Control',
-    href: '/dashboard/versions',
+    name: 'A/B Testing',
+    href: '/dashboard/ab-testing',
     icon: GitBranch,
   },
   {
-    name: 'A/B Testing',
-    href: '/dashboard/ab-testing',
-    icon: BarChart3,
+    name: 'Analytics',
+    href: '/dashboard/analytics',
+    icon: Target,
   },
   {
     name: 'Datasets',
@@ -60,6 +61,25 @@ const navigation = [
 export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = React.useState(false)
+  
+  // Add error handling for useAuth
+  let user = null
+  
+  try {
+    const auth = useAuth()
+    user = auth.user
+  } catch (error) {
+    console.warn('Auth context not available:', error)
+  }
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
 
   return (
     <div className={cn(
@@ -130,11 +150,17 @@ export function Sidebar() {
         <div className="p-4 border-t">
           <div className="flex items-center space-x-2">
             <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-              <span className="text-xs font-medium">JD</span>
+              <span className="text-xs font-medium">
+                {user ? getUserInitials(user.name) : 'U'}
+              </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">John Doe</p>
-              <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+              <p className="text-sm font-medium truncate">
+                {user ? user.name : 'User'}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user ? user.email : 'user@example.com'}
+              </p>
             </div>
           </div>
         </div>

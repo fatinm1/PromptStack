@@ -1,6 +1,10 @@
+"use client"
+
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/components/auth-provider'
+import { useRouter } from 'next/navigation'
 import { 
   Search, 
   Bell, 
@@ -11,6 +15,34 @@ import {
 } from 'lucide-react'
 
 export function Header() {
+  const router = useRouter()
+  
+  // Add error handling for useAuth
+  let user = null
+  let logout = () => {}
+  
+  try {
+    const auth = useAuth()
+    user = auth.user
+    logout = auth.logout
+  } catch (error) {
+    console.warn('Auth context not available:', error)
+  }
+
+  const handleLogout = () => {
+    logout()
+    router.push('/auth/signin')
+  }
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
   return (
     <header className="bg-card border-b px-6 py-4">
       <div className="flex items-center justify-between">
@@ -45,9 +77,13 @@ export function Header() {
           <div className="relative group">
             <Button variant="ghost" size="sm" className="gap-2">
               <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium">JD</span>
+                <span className="text-xs font-medium">
+                  {user ? getUserInitials(user.name) : 'U'}
+                </span>
               </div>
-              <span className="hidden md:inline">John Doe</span>
+              <span className="hidden md:inline">
+                {user ? user.name : 'User'}
+              </span>
             </Button>
             
             {/* Dropdown Menu */}
@@ -62,7 +98,10 @@ export function Header() {
                   Settings
                 </button>
                 <hr className="my-1" />
-                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors text-red-600">
+                <button 
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted transition-colors text-red-600"
+                  onClick={handleLogout}
+                >
                   <LogOut className="h-4 w-4" />
                   Sign Out
                 </button>
