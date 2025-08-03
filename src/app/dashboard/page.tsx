@@ -250,6 +250,27 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Empty State for New Users */}
+      {!loading && projects.length === 0 && (
+        <div>
+          <Card className="border-dashed border-2 border-muted-foreground/20">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <FolderOpen className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Get started by creating your first project to organize your prompts and datasets.
+              </p>
+              <Button onClick={handleCreateProject} className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Project
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Recent Projects */}
       {projects.length > 0 && (
         <div>
@@ -304,6 +325,18 @@ export default function DashboardPage() {
                   <li>Team collaboration features</li>
                   <li>Version control for prompts</li>
                 </ul>
+                {projects.length === 0 && (
+                  <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+                    <p className="font-medium mb-2">🚀 Quick Start Guide:</p>
+                    <ol className="list-decimal list-inside space-y-1 text-xs">
+                      <li>Create your first project to organize prompts</li>
+                      <li>Add prompts and test them with different inputs</li>
+                      <li>Use A/B testing to compare prompt versions</li>
+                      <li>Monitor costs and performance in Analytics</li>
+                      <li>Invite team members to collaborate</li>
+                    </ol>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

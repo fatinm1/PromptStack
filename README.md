@@ -1,189 +1,133 @@
-# PromptStack 🚀
+# PromptStack - GitHub for LLM Prompts & Workflows
 
-**GitHub for LLM Prompts & Workflows**
-
-PromptStack is a collaboration and version control platform for prompt engineering. Teams working with large language models (LLMs) often test and tweak many prompt variations. PromptStack helps you manage, test, and deploy prompts the same way Git helps manage code.
-
-## ✨ Features
-
-- **Prompt Versioning**: Track history and changes of prompts across projects
-- **Prompt Branching & Collaboration**: Fork prompts, collaborate with team members, and merge improvements
-- **Prompt Testing & Evaluation**: A/B test multiple prompts on sample inputs and rate outputs
-- **Dataset Management**: Upload and label test datasets for prompt validation
-- **Metrics Dashboard**: Token usage, response latency, cost per prompt, hallucination rate
-- **CI/CD for Prompts**: Deploy prompt changes safely to production via auto pipelines
-- **Prompt Templates**: Reusable components with variables (like `{{user_input}}` or `{{tone}}`)
-- **Integration**: Works with LangChain, LlamaIndex, OpenAI SDKs, and more
-
-## 🎨 Design Philosophy
-
-- **Modern & Minimal**: Clean, developer-focused interface inspired by Linear, Vercel, and Raycast
-- **Dark/Light Theme**: Full theme support with smooth transitions
-- **Responsive**: Works seamlessly across desktop, tablet, and mobile
-- **Accessible**: Built with accessibility in mind using Radix UI primitives
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **UI Components**: shadcn/ui (Radix UI + Tailwind)
-- **State Management**: Zustand
-- **Icons**: Lucide React
-- **Charts**: Recharts
-- **Code Editor**: Monaco Editor
-- **Animations**: Framer Motion
+A comprehensive platform for managing, versioning, testing, and deploying LLM prompts with team collaboration features.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-
 - Node.js 18+ 
-- npm, yarn, or pnpm
+- npm or yarn
+- Git
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/promptstack.git
-   cd promptstack
+   git clone https://github.com/fatinm1/PromptStack.git
+   cd PromptStack
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
-   # or
-   pnpm install
    ```
 
-3. **Start the development server**
+3. **Set up environment variables**
+   ```bash
+   cp env.example .env.local
+   ```
+   
+   Update `.env.local` with your configuration:
+   ```env
+   DATABASE_URL="file:./dev.db"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret-key-here"
+   OPENAI_API_KEY="your-openai-api-key"
+   ANTHROPIC_API_KEY="your-anthropic-api-key"
+   ```
+
+4. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   npx prisma db seed
+   ```
+
+5. **Start the development server**
    ```bash
    npm run dev
-   # or
-   yarn dev
-   # or
-   pnpm dev
    ```
 
-4. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🧪 Test Account
+
+For development and testing, you can use the following test account:
+
+- **Email:** `test@example.com`
+- **Password:** `test123`
+
+This account comes with sample data including:
+- 1 workspace
+- 1 project with sample prompts
+- 1 dataset with test items
+- Sample test runs and analytics data
+
+## 🎯 Features
+
+### Core Functionality
+- **Prompt Versioning**: Git-like version control for prompts
+- **A/B Testing**: Compare prompt versions with statistical analysis
+- **Real-time Collaboration**: Team editing with live cursors
+- **Cost Tracking**: Monitor token usage and costs
+- **Analytics Dashboard**: Performance metrics and insights
+
+### Team Features
+- **Workspace Management**: Organize projects by workspace
+- **Role-based Access**: Owner, Admin, and Member roles
+- **Activity Tracking**: Monitor team activity and changes
+- **Approval Workflows**: Review and approve prompt changes
+
+### AI Integration
+- **Multi-Model Support**: GPT-4, GPT-3.5, Claude, and more
+- **Real-time Testing**: Test prompts instantly
+- **Batch Processing**: Run tests on datasets
+- **Performance Monitoring**: Track latency and success rates
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Database**: SQLite (development), PostgreSQL (production)
+- **ORM**: Prisma
+- **Authentication**: NextAuth.js
+- **AI APIs**: OpenAI, Anthropic
+- **State Management**: Zustand
+- **Animations**: Framer Motion
+- **Code Editor**: Monaco Editor
 
 ## 📁 Project Structure
 
 ```
-promptstack/
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── dashboard/         # Dashboard pages
-│   │   ├── globals.css       # Global styles
-│   │   ├── layout.tsx        # Root layout
-│   │   └── page.tsx          # Landing page
-│   ├── components/            # React components
-│   │   ├── ui/               # shadcn/ui components
-│   │   └── dashboard/        # Dashboard-specific components
-│   ├── lib/                  # Utility functions
-│   ├── store/                # Zustand state management
-│   └── types/                # TypeScript type definitions
-├── public/                   # Static assets
-├── tailwind.config.js        # Tailwind configuration
-├── next.config.js           # Next.js configuration
-└── package.json             # Dependencies and scripts
+src/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── dashboard/         # Dashboard pages
+│   └── globals.css        # Global styles
+├── components/            # Reusable components
+│   ├── ui/               # shadcn/ui components
+│   └── dashboard/        # Dashboard-specific components
+├── lib/                  # Utility functions
+├── store/                # Zustand stores
+└── types/                # TypeScript types
 ```
-
-## 🎯 Core Features
-
-### 1. Prompt Editor
-- Monaco Editor integration for code-like editing
-- Syntax highlighting for prompt templates
-- Variable autocomplete and validation
-- Real-time collaboration
-
-### 2. Version Control
-- Git-like branching and merging
-- Diff viewer for prompt changes
-- Commit history and rollback
-- Collaborative versioning
-
-### 3. A/B Testing
-- Side-by-side prompt comparison
-- Automated evaluation metrics
-- Statistical significance testing
-- Winner selection algorithms
-
-### 4. Analytics Dashboard
-- Token usage tracking
-- Cost analysis and optimization
-- Performance metrics
-- Success rate monitoring
-
-### 5. Team Collaboration
-- Role-based access control
-- Real-time editing
-- Comment and review system
-- Approval workflows
-
-## 🎨 Design System
-
-### Colors
-- **Primary**: Indigo (`#6366F1`)
-- **Secondary**: Teal (`#00BFA6`)
-- **Dark Theme**: GitHub-inspired dark (`#0D1117`)
-- **Light Theme**: Clean white (`#F9FAFB`)
-
-### Typography
-- **Primary Font**: Inter
-- **Monospace**: IBM Plex Mono (for code)
-- **Hierarchy**: Clear type scale with proper contrast
-
-### Components
-- **Cards**: Elevated surfaces with subtle shadows
-- **Buttons**: Multiple variants with hover states
-- **Inputs**: Clean, accessible form controls
-- **Navigation**: Collapsible sidebar with smooth animations
 
 ## 🔧 Development
 
 ### Available Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript checks
 
-```bash
-# Development
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript type checking
-```
-
-### Code Style
-
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Configured with Next.js defaults
-- **Prettier**: Automatic code formatting
-- **Husky**: Pre-commit hooks for quality
-
-### Component Guidelines
-
-1. **Use shadcn/ui components** for consistency
-2. **Follow the design system** for colors and spacing
-3. **Implement proper TypeScript types** for all props
-4. **Add proper accessibility attributes**
-5. **Use Framer Motion** for smooth animations
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables
-3. Deploy automatically on push to main
-
-### Other Platforms
-
-- **Netlify**: Configure build settings
-- **Railway**: Deploy with Docker
-- **Self-hosted**: Use Docker Compose
+### Database Commands
+- `npx prisma studio` - Open database GUI
+- `npx prisma db push` - Push schema changes
+- `npx prisma db seed` - Seed with sample data
+- `npx prisma generate` - Generate Prisma client
 
 ## 🤝 Contributing
 
@@ -193,33 +137,17 @@ npm run type-check   # Run TypeScript type checking
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Development Guidelines
-
-- Follow the existing code style
-- Add tests for new features
-- Update documentation as needed
-- Ensure all TypeScript types are correct
-- Test on multiple browsers and devices
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🆘 Support
 
-- **shadcn/ui** for the excellent component library
-- **Radix UI** for accessible primitives
-- **Tailwind CSS** for the utility-first styling
-- **Vercel** for the amazing Next.js framework
-- **Linear** and **Vercel** for design inspiration
-
-## 📞 Support
-
-- **Documentation**: [docs.promptstack.com](https://docs.promptstack.com)
-- **Issues**: [GitHub Issues](https://github.com/your-username/promptstack/issues)
-- **Discord**: [Join our community](https://discord.gg/promptstack)
-- **Email**: support@promptstack.com
+If you encounter any issues or have questions:
+- Open an issue on GitHub
+- Check the documentation
+- Join our community discussions
 
 ---
 
-Built with ❤️ by the PromptStack team 
+**PromptStack** - Building the future of AI prompt engineering, one version at a time. 🚀 
