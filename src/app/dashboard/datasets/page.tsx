@@ -51,42 +51,8 @@ export default function DatasetsPage() {
     try {
       setLoading(true)
       // Mock data for now
-      const mockDatasets: Dataset[] = [
-        {
-          id: '1',
-          name: 'Customer Support Responses',
-          description: 'Dataset for testing customer support prompt variations',
-          itemCount: 150,
-          createdAt: '2024-01-15',
-          updatedAt: '2024-01-20',
-          tags: ['customer-support', 'responses'],
-          projectId: '1',
-          projectName: 'Customer Support AI'
-        },
-        {
-          id: '2',
-          name: 'Code Review Comments',
-          description: 'Test data for code review prompt evaluation',
-          itemCount: 75,
-          createdAt: '2024-01-10',
-          updatedAt: '2024-01-18',
-          tags: ['code-review', 'comments'],
-          projectId: '2',
-          projectName: 'Code Assistant'
-        },
-        {
-          id: '3',
-          name: 'Email Templates',
-          description: 'Dataset for email generation prompt testing',
-          itemCount: 200,
-          createdAt: '2024-01-05',
-          updatedAt: '2024-01-15',
-          tags: ['email', 'templates'],
-          projectId: '3',
-          projectName: 'Email Generator'
-        }
-      ]
-      setDatasets(mockDatasets)
+      // For new users, start with empty datasets
+      setDatasets([])
     } catch (error) {
       console.error('Error fetching datasets:', error)
     } finally {
@@ -195,16 +161,18 @@ export default function DatasetsPage() {
           <p>Loading datasets...</p>
         </div>
       ) : filteredDatasets.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No datasets found</h3>
-            <p className="text-muted-foreground mb-4">
-              Create your first dataset to start testing your prompts
+        <Card className="text-center py-16 border-dashed border-2 border-muted-foreground/20">
+          <CardContent>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <Database className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3">No datasets yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Create your first dataset to start testing your prompts with real data. Datasets help you evaluate prompt performance across multiple test cases.
             </p>
-            <Button onClick={handleCreateDataset}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Dataset
+            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary" onClick={handleCreateDataset}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Your First Dataset
             </Button>
           </CardContent>
         </Card>

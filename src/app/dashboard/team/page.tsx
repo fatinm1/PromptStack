@@ -54,57 +54,8 @@ export default function TeamPage() {
     try {
       setLoading(true)
       // Mock data for now
-      const mockMembers: TeamMember[] = [
-        {
-          id: '1',
-          name: 'Sarah Chen',
-          email: 'sarah@example.com',
-          avatar: 'https://avatars.githubusercontent.com/u/1',
-          role: 'ADMIN',
-          status: 'active',
-          joinedAt: '2024-01-01',
-          lastActive: '2024-01-20',
-          projects: 5,
-          prompts: 12
-        },
-        {
-          id: '2',
-          name: 'Mike Rodriguez',
-          email: 'mike@example.com',
-          avatar: 'https://avatars.githubusercontent.com/u/2',
-          role: 'MEMBER',
-          status: 'active',
-          joinedAt: '2024-01-05',
-          lastActive: '2024-01-19',
-          projects: 3,
-          prompts: 8
-        },
-        {
-          id: '3',
-          name: 'Alex Thompson',
-          email: 'alex@example.com',
-          avatar: 'https://avatars.githubusercontent.com/u/3',
-          role: 'VIEWER',
-          status: 'active',
-          joinedAt: '2024-01-10',
-          lastActive: '2024-01-18',
-          projects: 2,
-          prompts: 4
-        },
-        {
-          id: '4',
-          name: 'Emily Davis',
-          email: 'emily@example.com',
-          avatar: 'https://avatars.githubusercontent.com/u/4',
-          role: 'MEMBER',
-          status: 'pending',
-          joinedAt: '2024-01-15',
-          lastActive: '2024-01-15',
-          projects: 0,
-          prompts: 0
-        }
-      ]
-      setMembers(mockMembers)
+      // For new users, start with empty team
+      setMembers([])
     } catch (error) {
       console.error('Error fetching team members:', error)
     } finally {
@@ -227,13 +178,32 @@ export default function TeamPage() {
         </Button>
       </div>
 
+      {/* Empty State */}
+      {!loading && filteredMembers.length === 0 && (
+        <Card className="text-center py-16 border-dashed border-2 border-muted-foreground/20">
+          <CardContent>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <Users className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3">No team members yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Invite team members to collaborate on your prompts and projects. You can assign different roles and permissions to each member.
+            </p>
+            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary" onClick={handleInviteMember}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Invite Your First Member
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Team Members */}
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p>Loading team members...</p>
         </div>
-      ) : (
+      ) : filteredMembers.length > 0 && (
         <div className="space-y-4">
           {filteredMembers.map((member) => (
             <Card key={member.id} className="hover:shadow-lg transition-shadow">

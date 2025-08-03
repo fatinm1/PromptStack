@@ -16,47 +16,7 @@ import {
   MoreVertical
 } from 'lucide-react'
 
-const mockPrompts = [
-  {
-    id: '1',
-    name: 'Email Summarizer',
-    description: 'Summarize long emails into concise bullet points',
-    content: 'Summarize the following email in 3-5 bullet points: {{email_content}}',
-    version: 3,
-    model: 'gpt-4',
-    temperature: 0.7,
-    tags: ['email', 'summarization'],
-    lastModified: '2024-01-15T10:30:00Z',
-    testRuns: 45,
-    avgRating: 4.2
-  },
-  {
-    id: '2',
-    name: 'Content Generator',
-    description: 'Generate blog post content based on keywords',
-    content: 'Write a blog post about {{topic}} with the following keywords: {{keywords}}',
-    version: 2,
-    model: 'gpt-3.5-turbo',
-    temperature: 0.8,
-    tags: ['content', 'blog'],
-    lastModified: '2024-01-14T15:20:00Z',
-    testRuns: 23,
-    avgRating: 3.8
-  },
-  {
-    id: '3',
-    name: 'Code Assistant',
-    description: 'Help with code review and suggestions',
-    content: 'Review this code and suggest improvements: {{code}}',
-    version: 1,
-    model: 'gpt-4',
-    temperature: 0.3,
-    tags: ['code', 'review'],
-    lastModified: '2024-01-13T09:15:00Z',
-    testRuns: 67,
-    avgRating: 4.5
-  }
-]
+const mockPrompts: any[] = []
 
 export default function PromptsPage() {
   const [searchQuery, setSearchQuery] = React.useState('')
@@ -65,7 +25,7 @@ export default function PromptsPage() {
   const filteredPrompts = mockPrompts.filter(prompt =>
     prompt.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    prompt.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    prompt.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (
@@ -123,7 +83,7 @@ export default function PromptsPage() {
               <div className="space-y-4">
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1">
-                  {prompt.tags.map((tag, index) => (
+                  {prompt.tags.map((tag: string, index: number) => (
                     <span
                       key={index}
                       className="px-2 py-1 bg-muted text-xs rounded-md"
@@ -166,16 +126,21 @@ export default function PromptsPage() {
 
       {/* Empty State */}
       {filteredPrompts.length === 0 && (
-        <Card className="text-center py-12">
+        <Card className="text-center py-16 border-dashed border-2 border-muted-foreground/20">
           <CardContent>
-            <Code className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No prompts found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchQuery ? 'Try adjusting your search terms.' : 'Create your first prompt to get started.'}
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <Code className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3">No prompts yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              {searchQuery 
+                ? 'Try adjusting your search terms.' 
+                : 'Create your first prompt to start building AI applications. Prompts are the building blocks of your AI workflows.'
+              }
             </p>
-            <Button>
+            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary">
               <Plus className="mr-2 h-4 w-4" />
-              Create Prompt
+              Create Your First Prompt
             </Button>
           </CardContent>
         </Card>

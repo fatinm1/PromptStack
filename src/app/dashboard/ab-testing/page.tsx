@@ -16,34 +16,7 @@ import {
   Clock
 } from 'lucide-react'
 
-const mockABTests = [
-  {
-    id: '1',
-    name: 'Email Subject Line Test',
-    description: 'Testing different email subject line approaches',
-    promptA: 'Subject: {{product_name}} - Limited Time Offer Inside!',
-    promptB: 'Subject: Don\'t miss out on {{product_name}} savings',
-    status: 'running',
-    participants: 150,
-    duration: '3 days',
-    winner: null,
-    ratingA: 4.2,
-    ratingB: 3.8
-  },
-  {
-    id: '2',
-    name: 'Product Description Test',
-    description: 'Comparing different product description styles',
-    promptA: 'Introducing {{product_name}}: {{key_feature}}. Perfect for {{use_case}}.',
-    promptB: '{{product_name}} - {{key_feature}} that {{use_case}}. Experience the difference.',
-    status: 'completed',
-    participants: 200,
-    duration: '5 days',
-    winner: 'A',
-    ratingA: 4.5,
-    ratingB: 4.1
-  }
-]
+const mockABTests: any[] = []
 
 export default function ABTestingPage() {
   const [selectedTest, setSelectedTest] = React.useState<string | null>(null)
@@ -72,79 +45,100 @@ export default function ABTestingPage() {
         </Button>
       </div>
 
+      {/* Empty State */}
+      {mockABTests.length === 0 && (
+        <Card className="text-center py-16 border-dashed border-2 border-muted-foreground/20">
+          <CardContent>
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+              <BarChart3 className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3">No A/B tests yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Create your first A/B test to compare different prompt versions and find the best performing ones.
+            </p>
+            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Your First A/B Test
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Active Tests */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {mockABTests.map((test) => (
-          <Card key={test.id} className="card-hover">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="flex items-center">
-                    <BarChart3 className="w-4 h-4 mr-2 text-promptstack-primary" />
-                    {test.name}
-                  </CardTitle>
-                  <CardDescription className="mt-2">
-                    {test.description}
-                  </CardDescription>
-                </div>
-                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  test.status === 'running' 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                }`}>
-                  {test.status}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{test.participants}</span>
+      {mockABTests.length > 0 && (
+        <div className="grid gap-6 md:grid-cols-2">
+          {mockABTests.map((test) => (
+            <Card key={test.id} className="card-hover">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="flex items-center">
+                      <BarChart3 className="w-4 h-4 mr-2 text-promptstack-primary" />
+                      {test.name}
+                    </CardTitle>
+                    <CardDescription className="mt-2">
+                      {test.description}
+                    </CardDescription>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>{test.duration}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Star className="h-4 w-4 text-muted-foreground" />
-                    <span>{test.ratingA} vs {test.ratingB}</span>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    test.status === 'running' 
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                  }`}>
+                    {test.status}
                   </div>
                 </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span>{test.participants}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>{test.duration}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="h-4 w-4 text-muted-foreground" />
+                      <span>{test.ratingA} vs {test.ratingB}</span>
+                    </div>
+                  </div>
 
-                {/* Winner */}
-                {test.winner && (
-                  <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-600">
-                      Winner: Version {test.winner}
-                    </span>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedTest(test.id)}
-                  >
-                    View Details
-                  </Button>
-                  {test.status === 'running' && (
-                    <Button size="sm" disabled>
-                      <Play className="w-4 h-4 mr-2" />
-                      Running
-                    </Button>
+                  {/* Winner */}
+                  {test.winner && (
+                    <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-600">
+                        Winner: Version {test.winner}
+                      </span>
+                    </div>
                   )}
+
+                  {/* Actions */}
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedTest(test.id)}
+                    >
+                      View Details
+                    </Button>
+                    {test.status === 'running' && (
+                      <Button size="sm" disabled>
+                        <Play className="w-4 h-4 mr-2" />
+                        Running
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Test Runner */}
       {selectedTest && (
