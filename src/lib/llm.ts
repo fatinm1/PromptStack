@@ -1,14 +1,13 @@
 import OpenAI from 'openai'
 import Anthropic from '@anthropic-ai/sdk'
-import { calculateTokenUsage, calculateCost } from './utils'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+export interface LLMConfig {
+  provider: 'openai' | 'anthropic'
+  model: string
+  temperature?: number
+  maxTokens?: number
+  apiKey: string
+}
 
 export interface LLMResponse {
   content: string
@@ -16,122 +15,256 @@ export interface LLMResponse {
   cost: number
   latency: number
   model: string
+  provider: string
+  error?: string
 }
 
-export interface PromptRequest {
-  content: string
-  variables: Record<string, any>
+export interface TestRun {
+  promptId: string
+  input: Record<string, any>
+  output: string
+  tokensUsed: number
+  cost: number
+  latency: number
   model: string
-  temperature?: number
-  maxTokens?: number
-  topP?: number
-  frequencyPenalty?: number
-  presencePenalty?: number
+  provider: string
+  rating?: number
+  feedback?: string
+  error?: string
 }
 
-export async function runPrompt(request: PromptRequest): Promise<LLMResponse> {
-  const startTime = Date.now()
-  
-  // Replace variables in prompt
-  let processedContent = request.content
-  for (const [key, value] of Object.entries(request.variables)) {
-    processedContent = processedContent.replace(
-      new RegExp(`{{${key}}}`, 'g'),
-      String(value)
-    )
+// Cost per 1K tokens (approximate)
+const COST_PER_1K_TOKENS = {
+  'gpt-3.5-turbo': { input: 0.0015, output: 0.002 },
+  'gpt-4': { input: 0.03, output: 0.06 },
+  'gpt-4-turbo': { input: 0.01, output: 0.03 },
+  'claude-3-sonnet': { input: 0.003, output: 0.015 },
+  'claude-3-opus': { input: 0.015, output: 0.075 },
+  'claude-3-haiku': { input: 0.00025, output: 0.00125 }
+}
+
+export class LLMService {
+  private openai: OpenAI | null = null
+  private anthropic: Anthropic | null = null
+
+  constructor() {}
+
+  private initializeOpenAI(apiKey: string) {
+    if (!this.openai) {
+      this.openai = new OpenAI({
+        apiKey
+      })
+    }
   }
 
-  try {
-    let response: LLMResponse
+  private initializeAnthropic(apiKey: string) {
+    if (!this.anthropic) {
+      this.anthropic = new Anthropic({
+        apiKey
+      })
+    }
+  }
 
-    if (request.model.startsWith('gpt-')) {
-      response = await runOpenAI(processedContent, request)
-    } else if (request.model.startsWith('claude-')) {
-      response = await runAnthropic(processedContent, request)
-    } else {
-      throw new Error(`Unsupported model: ${request.model}`)
+  private calculateCost(
+    provider: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number
+  ): number {
+    const costs = COST_PER_1K_TOKENS[model as keyof typeof COST_PER_1K_TOKENS]
+    if (!costs) {
+      // Default cost if model not found
+      return (inputTokens + outputTokens) * 0.001
     }
 
-    const latency = Date.now() - startTime
+    const inputCost = (inputTokens / 1000) * costs.input
+    const outputCost = (outputTokens / 1000) * costs.output
+    return inputCost + outputCost
+  }
+
+  private async callOpenAI(
+    prompt: string,
+    config: LLMConfig
+  ): Promise<LLMResponse> {
+    const startTime = Date.now()
+    
+    try {
+      this.initializeOpenAI(config.apiKey)
+      
+      const completion = await this.openai!.chat.completions.create({
+        model: config.model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: config.temperature || 0.7,
+        max_tokens: config.maxTokens || 1000,
+      })
+
+      const endTime = Date.now()
+      const latency = endTime - startTime
+      
+      const inputTokens = completion.usage?.prompt_tokens || 0
+      const outputTokens = completion.usage?.completion_tokens || 0
+      const totalTokens = completion.usage?.total_tokens || 0
+      
+      const cost = this.calculateCost('openai', config.model, inputTokens, outputTokens)
+
+      return {
+        content: completion.choices[0]?.message?.content || '',
+        tokensUsed: totalTokens,
+        cost,
+        latency,
+        model: config.model,
+        provider: 'openai'
+      }
+    } catch (error: any) {
+      return {
+        content: '',
+        tokensUsed: 0,
+        cost: 0,
+        latency: Date.now() - startTime,
+        model: config.model,
+        provider: 'openai',
+        error: error.message || 'OpenAI API error'
+      }
+    }
+  }
+
+  private async callAnthropic(
+    prompt: string,
+    config: LLMConfig
+  ): Promise<LLMResponse> {
+    const startTime = Date.now()
+    
+    try {
+      this.initializeAnthropic(config.apiKey)
+      
+      const completion = await this.anthropic!.completions.create({
+        model: config.model,
+        max_tokens_to_sample: config.maxTokens || 1000,
+        temperature: config.temperature || 0.7,
+        prompt: `\n\nHuman: ${prompt}\n\nAssistant:`
+      })
+
+      const endTime = Date.now()
+      const latency = endTime - startTime
+      
+      // Anthropic completions don't provide token usage in the response
+      // We'll estimate based on input/output length
+      const inputTokens = Math.ceil(prompt.length / 4) // Rough estimate
+      const outputTokens = Math.ceil(completion.completion.length / 4) // Rough estimate
+      const totalTokens = inputTokens + outputTokens
+      
+      const cost = this.calculateCost('anthropic', config.model, inputTokens, outputTokens)
+
+      return {
+        content: completion.completion || '',
+        tokensUsed: totalTokens,
+        cost,
+        latency,
+        model: config.model,
+        provider: 'anthropic'
+      }
+    } catch (error: any) {
+      return {
+        content: '',
+        tokensUsed: 0,
+        cost: 0,
+        latency: Date.now() - startTime,
+        model: config.model,
+        provider: 'anthropic',
+        error: error.message || 'Anthropic API error'
+      }
+    }
+  }
+
+  async generateResponse(
+    prompt: string,
+    config: LLMConfig
+  ): Promise<LLMResponse> {
+    if (!config.apiKey) {
+      return {
+        content: '',
+        tokensUsed: 0,
+        cost: 0,
+        latency: 0,
+        model: config.model,
+        provider: config.provider,
+        error: 'API key is required'
+      }
+    }
+
+    switch (config.provider) {
+      case 'openai':
+        return await this.callOpenAI(prompt, config)
+      case 'anthropic':
+        return await this.callAnthropic(prompt, config)
+      default:
+        return {
+          content: '',
+          tokensUsed: 0,
+          cost: 0,
+          latency: 0,
+          model: config.model,
+          provider: config.provider,
+          error: 'Unsupported provider'
+        }
+    }
+  }
+
+  async testPrompt(
+    promptTemplate: string,
+    testInput: Record<string, any>,
+    config: LLMConfig
+  ): Promise<TestRun> {
+    // Replace placeholders in the prompt template
+    let processedPrompt = promptTemplate
+    for (const [key, value] of Object.entries(testInput)) {
+      const placeholder = `{{${key}}}`
+      processedPrompt = processedPrompt.replace(new RegExp(placeholder, 'g'), String(value))
+    }
+
+    const response = await this.generateResponse(processedPrompt, config)
+
     return {
-      ...response,
-      latency
+      promptId: '', // Will be set by the caller
+      input: testInput,
+      output: response.content,
+      tokensUsed: response.tokensUsed,
+      cost: response.cost,
+      latency: response.latency,
+      model: response.model,
+      provider: response.provider,
+      error: response.error
     }
-  } catch (error) {
-    console.error('LLM error:', error)
-    throw error
+  }
+
+  getAvailableModels(provider: 'openai' | 'anthropic'): string[] {
+    if (provider === 'openai') {
+      return [
+        'gpt-3.5-turbo',
+        'gpt-4',
+        'gpt-4-turbo',
+        'gpt-4o',
+        'gpt-4o-mini'
+      ]
+    } else {
+      return [
+        'claude-3-sonnet',
+        'claude-3-opus',
+        'claude-3-haiku',
+        'claude-2.1',
+        'claude-2.0'
+      ]
+    }
+  }
+
+  validateApiKey(provider: 'openai' | 'anthropic', apiKey: string): boolean {
+    if (provider === 'openai') {
+      return apiKey.startsWith('sk-') && apiKey.length > 20
+    } else {
+      return apiKey.startsWith('sk-ant-') && apiKey.length > 20
+    }
   }
 }
 
-async function runOpenAI(content: string, request: PromptRequest): Promise<LLMResponse> {
-  const completion = await openai.chat.completions.create({
-    model: request.model,
-    messages: [{ role: 'user', content }],
-    temperature: request.temperature || 0.7,
-    max_tokens: request.maxTokens,
-    top_p: request.topP,
-    frequency_penalty: request.frequencyPenalty,
-    presence_penalty: request.presencePenalty,
-  })
-
-  const responseContent = completion.choices[0]?.message?.content || ''
-  const tokensUsed = completion.usage?.total_tokens || 0
-  const cost = calculateCost(tokensUsed, request.model)
-
-  return {
-    content: responseContent,
-    tokensUsed,
-    cost,
-    latency: 0, // Will be calculated by caller
-    model: request.model
-  }
-}
-
-async function runAnthropic(content: string, request: PromptRequest): Promise<LLMResponse> {
-  const message = await anthropic.messages.create({
-    model: request.model,
-    max_tokens: request.maxTokens || 4096,
-    temperature: request.temperature || 0.7,
-    messages: [{ role: 'user', content }],
-  })
-
-  const responseContent = message.content[0]?.text || ''
-  const tokensUsed = message.usage?.input_tokens + message.usage?.output_tokens || 0
-  const cost = calculateCost(tokensUsed, request.model)
-
-  return {
-    content: responseContent,
-    tokensUsed,
-    cost,
-    latency: 0, // Will be calculated by caller
-    model: request.model
-  }
-}
-
-export async function runABTest(
-  promptA: string,
-  promptB: string,
-  testInput: string,
-  model: string,
-  temperature: number = 0.7
-): Promise<{
-  outputA: LLMResponse
-  outputB: LLMResponse
-}> {
-  const [outputA, outputB] = await Promise.all([
-    runPrompt({
-      content: promptA,
-      variables: { input: testInput },
-      model,
-      temperature
-    }),
-    runPrompt({
-      content: promptB,
-      variables: { input: testInput },
-      model,
-      temperature
-    })
-  ])
-
-  return { outputA, outputB }
-} 
+// Export a singleton instance
+export const llmService = new LLMService() 

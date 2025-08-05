@@ -5,94 +5,129 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { 
-  User,
   Settings,
-  Shield,
-  Key,
+  User,
   Bell,
+  Key,
   Palette,
-  Database,
   Globe,
+  Shield,
   Save,
-  Eye,
-  EyeOff
+  Trash2,
+  Download,
+  Upload
 } from 'lucide-react'
 
 interface UserSettings {
   name: string
   email: string
-  avatar?: string
+  avatar: string
+  timezone: string
+  language: string
+  theme: 'light' | 'dark' | 'system'
   notifications: {
     email: boolean
-    browser: boolean
-    weekly: boolean
+    push: boolean
+    testResults: boolean
+    abTestUpdates: boolean
   }
-  preferences: {
-    theme: 'light' | 'dark' | 'system'
-    language: string
-    timezone: string
+  apiKeys: {
+    openai: string
+    anthropic: string
   }
   workspace: {
     name: string
     description: string
     defaultModel: string
-    defaultTemperature: number
-    maxTokens: number
   }
 }
 
 export default function SettingsPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [settings, setSettings] = useState<UserSettings>({
     name: user?.name || '',
     email: user?.email || '',
-    avatar: user?.avatar,
+    avatar: user?.avatar || '',
+    timezone: 'UTC',
+    language: 'en',
+    theme: 'system',
     notifications: {
       email: true,
-      browser: true,
-      weekly: false
+      push: true,
+      testResults: true,
+      abTestUpdates: true
     },
-    preferences: {
-      theme: 'system',
-      language: 'en',
-      timezone: 'UTC'
+    apiKeys: {
+      openai: '',
+      anthropic: ''
     },
     workspace: {
       name: 'My Workspace',
-      description: 'Default workspace',
-      defaultModel: 'gpt-3.5-turbo',
-      defaultTemperature: 0.7,
-      maxTokens: 4096
+      description: '',
+      defaultModel: 'gpt-3.5-turbo'
     }
   })
-  const [loading, setLoading] = useState(false)
-  const [showApiKey, setShowApiKey] = useState(false)
 
   useEffect(() => {
     if (user) {
-      setSettings(prev => ({
-        ...prev,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar
-      }))
+      loadSettings()
     }
   }, [user])
 
-  const handleSave = async () => {
-    setLoading(true)
+  const loadSettings = async () => {
     try {
-      // In a real app, you'd save to the API
+      setLoading(true)
+      // In a real app, you'd fetch settings from the API
+      // For now, we'll use the default settings
+    } catch (error) {
+      console.error('Error loading settings:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      setSaving(true)
+      // In a real app, you'd save settings to the API
+      console.log('Saving settings:', settings)
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Settings saved:', settings)
+      console.log('Settings saved successfully!')
     } catch (error) {
       console.error('Error saving settings:', error)
     } finally {
-      setLoading(false)
+      setSaving(false)
+    }
+  }
+
+  const handleExportData = () => {
+    // Export user data
+    const data = {
+      user: settings,
+      timestamp: new Date().toISOString()
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'promptstack-settings.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDeleteAccount = () => {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      // In a real app, you'd call the delete account API
+      console.log('Deleting account...')
     }
   }
 
@@ -109,60 +144,85 @@ export default function SettingsPage() {
     )
   }
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Settings</h1>
+            <p className="text-muted-foreground">Manage your account and preferences</p>
+          </div>
+        </div>
+        <Card>
+          <CardContent className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <Settings className="w-8 h-8 text-muted-foreground animate-spin mx-auto mb-4" />
+              <p>Loading settings...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account and workspace preferences
-          </p>
+          <p className="text-muted-foreground">Manage your account and preferences</p>
         </div>
-        <Button onClick={handleSave} disabled={loading}>
-          <Save className="w-4 h-4 mr-2" />
-          {loading ? 'Saving...' : 'Save Changes'}
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={handleExportData}>
+            <Download className="w-4 h-4 mr-2" />
+            Export Data
+          </Button>
+          <Button onClick={handleSave} disabled={saving}>
+            <Save className="w-4 h-4 mr-2" />
+            {saving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Profile Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+            <CardTitle className="flex items-center">
+              <User className="w-5 h-5 mr-2" />
               Profile Settings
             </CardTitle>
             <CardDescription>
-              Update your personal information
+              Update your personal information and account details
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
                 value={settings.name}
-                onChange={(e) => setSettings(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Your name"
+                onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                placeholder="Enter your full name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={settings.email}
-                onChange={(e) => setSettings(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="your@email.com"
+                onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                placeholder="Enter your email"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="avatar">Avatar URL</Label>
               <Input
                 id="avatar"
-                value={settings.avatar || ''}
-                onChange={(e) => setSettings(prev => ({ ...prev, avatar: e.target.value }))}
+                value={settings.avatar}
+                onChange={(e) => setSettings({ ...settings, avatar: e.target.value })}
                 placeholder="https://example.com/avatar.jpg"
               />
             </div>
@@ -172,12 +232,12 @@ export default function SettingsPage() {
         {/* Workspace Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
+            <CardTitle className="flex items-center">
+              <Globe className="w-5 h-5 mr-2" />
               Workspace Settings
             </CardTitle>
             <CardDescription>
-              Configure your workspace preferences
+              Configure your workspace preferences and default settings
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -186,110 +246,84 @@ export default function SettingsPage() {
               <Input
                 id="workspace-name"
                 value={settings.workspace.name}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  workspace: { ...prev.workspace, name: e.target.value }
-                }))}
+                onChange={(e) => setSettings({
+                  ...settings,
+                  workspace: { ...settings.workspace, name: e.target.value }
+                })}
                 placeholder="My Workspace"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="workspace-description">Description</Label>
               <Input
-                id="description"
+                id="workspace-description"
                 value={settings.workspace.description}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  workspace: { ...prev.workspace, description: e.target.value }
-                }))}
-                placeholder="Workspace description"
+                onChange={(e) => setSettings({
+                  ...settings,
+                  workspace: { ...settings.workspace, description: e.target.value }
+                })}
+                placeholder="Describe your workspace"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="default-model">Default Model</Label>
-              <select
-                id="default-model"
+              <Select
                 value={settings.workspace.defaultModel}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  workspace: { ...prev.workspace, defaultModel: e.target.value }
-                }))}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                onValueChange={(value) => setSettings({
+                  ...settings,
+                  workspace: { ...settings.workspace, defaultModel: value }
+                })}
               >
-                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                <option value="gpt-4">GPT-4</option>
-                <option value="claude-3">Claude-3</option>
-                <option value="claude-2">Claude-2</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select default model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                  <SelectItem value="gpt-4">GPT-4</SelectItem>
+                  <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                  <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
 
-        {/* API Configuration */}
+        {/* API Keys */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-4 w-4" />
-              API Configuration
+            <CardTitle className="flex items-center">
+              <Key className="w-5 h-5 mr-2" />
+              API Keys
             </CardTitle>
             <CardDescription>
-              Manage your API keys and settings
+              Manage your LLM provider API keys securely
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="openai-key">OpenAI API Key</Label>
-              <div className="relative">
-                <Input
-                  id="openai-key"
-                  type={showApiKey ? 'text' : 'password'}
-                  placeholder="sk-..."
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                >
-                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
+              <Input
+                id="openai-key"
+                type="password"
+                value={settings.apiKeys.openai}
+                onChange={(e) => setSettings({
+                  ...settings,
+                  apiKeys: { ...settings.apiKeys, openai: e.target.value }
+                })}
+                placeholder="sk-..."
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="anthropic-key">Anthropic API Key</Label>
-              <div className="relative">
-                <Input
-                  id="anthropic-key"
-                  type={showApiKey ? 'text' : 'password'}
-                  placeholder="sk-ant-..."
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                >
-                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="temperature">Default Temperature</Label>
               <Input
-                id="temperature"
-                type="number"
-                min="0"
-                max="2"
-                step="0.1"
-                value={settings.workspace.defaultTemperature}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  workspace: { ...prev.workspace, defaultTemperature: parseFloat(e.target.value) }
-                }))}
+                id="anthropic-key"
+                type="password"
+                value={settings.apiKeys.anthropic}
+                onChange={(e) => setSettings({
+                  ...settings,
+                  apiKeys: { ...settings.apiKeys, anthropic: e.target.value }
+                })}
+                placeholder="sk-ant-..."
               />
             </div>
           </CardContent>
@@ -298,8 +332,8 @@ export default function SettingsPage() {
         {/* Notifications */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
+            <CardTitle className="flex items-center">
+              <Bell className="w-5 h-5 mr-2" />
               Notifications
             </CardTitle>
             <CardDescription>
@@ -308,57 +342,55 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="email-notifications">Email Notifications</Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive notifications via email
-                </p>
+              <div className="space-y-0.5">
+                <Label>Email Notifications</Label>
+                <p className="text-sm text-muted-foreground">Receive updates via email</p>
               </div>
-              <input
-                id="email-notifications"
-                type="checkbox"
+              <Switch
                 checked={settings.notifications.email}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  notifications: { ...prev.notifications, email: e.target.checked }
-                }))}
-                className="h-4 w-4"
+                onCheckedChange={(checked) => setSettings({
+                  ...settings,
+                  notifications: { ...settings.notifications, email: checked }
+                })}
               />
             </div>
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="browser-notifications">Browser Notifications</Label>
-                <p className="text-sm text-muted-foreground">
-                  Show notifications in browser
-                </p>
+              <div className="space-y-0.5">
+                <Label>Push Notifications</Label>
+                <p className="text-sm text-muted-foreground">Receive browser notifications</p>
               </div>
-              <input
-                id="browser-notifications"
-                type="checkbox"
-                checked={settings.notifications.browser}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  notifications: { ...prev.notifications, browser: e.target.checked }
-                }))}
-                className="h-4 w-4"
+              <Switch
+                checked={settings.notifications.push}
+                onCheckedChange={(checked) => setSettings({
+                  ...settings,
+                  notifications: { ...settings.notifications, push: checked }
+                })}
               />
             </div>
             <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="weekly-reports">Weekly Reports</Label>
-                <p className="text-sm text-muted-foreground">
-                  Receive weekly performance reports
-                </p>
+              <div className="space-y-0.5">
+                <Label>Test Results</Label>
+                <p className="text-sm text-muted-foreground">Notify when tests complete</p>
               </div>
-              <input
-                id="weekly-reports"
-                type="checkbox"
-                checked={settings.notifications.weekly}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  notifications: { ...prev.notifications, weekly: e.target.checked }
-                }))}
-                className="h-4 w-4"
+              <Switch
+                checked={settings.notifications.testResults}
+                onCheckedChange={(checked) => setSettings({
+                  ...settings,
+                  notifications: { ...settings.notifications, testResults: checked }
+                })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>A/B Test Updates</Label>
+                <p className="text-sm text-muted-foreground">Notify about A/B test progress</p>
+              </div>
+              <Switch
+                checked={settings.notifications.abTestUpdates}
+                onCheckedChange={(checked) => setSettings({
+                  ...settings,
+                  notifications: { ...settings.notifications, abTestUpdates: checked }
+                })}
               />
             </div>
           </CardContent>
@@ -367,65 +399,68 @@ export default function SettingsPage() {
         {/* Appearance */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
+            <CardTitle className="flex items-center">
+              <Palette className="w-5 h-5 mr-2" />
               Appearance
             </CardTitle>
             <CardDescription>
-              Customize your interface appearance
+              Customize the look and feel of the application
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="theme">Theme</Label>
-              <select
-                id="theme"
-                value={settings.preferences.theme}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  preferences: { ...prev.preferences, theme: e.target.value as 'light' | 'dark' | 'system' }
-                }))}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background"
+              <Select
+                value={settings.theme}
+                onValueChange={(value: 'light' | 'dark' | 'system') => setSettings({
+                  ...settings,
+                  theme: value
+                })}
               >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="system">System</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="language">Language</Label>
-              <select
-                id="language"
-                value={settings.preferences.language}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  preferences: { ...prev.preferences, language: e.target.value }
-                }))}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background"
-              >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Light</SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                  <SelectItem value="system">System</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="timezone">Timezone</Label>
-              <select
-                id="timezone"
-                value={settings.preferences.timezone}
-                onChange={(e) => setSettings(prev => ({ 
-                  ...prev, 
-                  preferences: { ...prev.preferences, timezone: e.target.value }
-                }))}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background"
+              <Select
+                value={settings.timezone}
+                onValueChange={(value) => setSettings({ ...settings, timezone: value })}
               >
-                <option value="UTC">UTC</option>
-                <option value="America/New_York">Eastern Time</option>
-                <option value="America/Chicago">Central Time</option>
-                <option value="America/Denver">Mountain Time</option>
-                <option value="America/Los_Angeles">Pacific Time</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select timezone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="UTC">UTC</SelectItem>
+                  <SelectItem value="America/New_York">Eastern Time</SelectItem>
+                  <SelectItem value="America/Chicago">Central Time</SelectItem>
+                  <SelectItem value="America/Denver">Mountain Time</SelectItem>
+                  <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="language">Language</Label>
+              <Select
+                value={settings.language}
+                onValueChange={(value) => setSettings({ ...settings, language: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="de">Deutsch</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
@@ -433,12 +468,12 @@ export default function SettingsPage() {
         {/* Security */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
+            <CardTitle className="flex items-center">
+              <Shield className="w-5 h-5 mr-2" />
               Security
             </CardTitle>
             <CardDescription>
-              Manage your account security
+              Manage your account security settings
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -451,7 +486,12 @@ export default function SettingsPage() {
             <Button variant="outline" className="w-full">
               View Login History
             </Button>
-            <Button variant="outline" className="w-full text-red-600">
+            <Button 
+              variant="destructive" 
+              className="w-full"
+              onClick={handleDeleteAccount}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
               Delete Account
             </Button>
           </CardContent>

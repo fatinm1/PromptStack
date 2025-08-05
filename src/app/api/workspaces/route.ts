@@ -1,34 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import prisma from '@/lib/db'
-import { authOptions } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    // Get the user ID from the Authorization header
+    const authHeader = request.headers.get('authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ workspaces: [] })
     }
 
+    const userId = authHeader.replace('Bearer ', '')
+    
+    // Verify the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    })
+
+    if (!user) {
+      return NextResponse.json({ workspaces: [] })
+    }
+
+    // Get the user's workspaces
     const workspaces = await prisma.workspace.findMany({
       where: {
         members: {
-          some: { userId: session.user.id }
+          some: { userId: user.id }
         }
       },
       include: {
-        members: {
-          include: {
-            user: {
-              select: { name: true, email: true }
-            }
-          }
+        creator: {
+          select: { name: true, email: true }
         },
         _count: {
-          select: { projects: true }
+          select: { projects: true, members: true }
         }
       },
       orderBy: { updatedAt: 'desc' }

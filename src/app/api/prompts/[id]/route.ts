@@ -8,7 +8,7 @@ const updatePromptSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
   content: z.string().min(1, 'Content is required').optional(),
   description: z.string().optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.string().optional(),
   model: z.string().optional(),
   temperature: z.number().min(0).max(2).optional(),
   maxTokens: z.number().optional(),
@@ -23,8 +23,19 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    // Try to get user ID from Bearer token first
+    let userId: string | null = null
+    const authHeader = request.headers.get('authorization')
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      userId = authHeader.replace('Bearer ', '')
+    } else {
+      // Fall back to NextAuth session
+      const session = await getServerSession(authOptions)
+      userId = session?.user?.id || null
+    }
+
+    if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -37,7 +48,7 @@ export async function GET(
         project: {
           workspace: {
             members: {
-              some: { userId: session.user.id }
+              some: { userId }
             }
           }
         }
@@ -71,7 +82,7 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(prompt)
+    return NextResponse.json({ prompt })
   } catch (error) {
     console.error('Get prompt error:', error)
     return NextResponse.json(
@@ -126,7 +137,7 @@ export async function PUT(
           version: currentPrompt.version + 1,
           content: currentPrompt.content,
           description: `Version ${currentPrompt.version}`,
-          changes: ['Content updated'],
+          changes: 'Content updated',
           createdBy: session.user.id
         }
       })
@@ -137,7 +148,8 @@ export async function PUT(
       where: { id: params.id },
       data: {
         ...data,
-        version: data.content ? currentPrompt.version + 1 : currentPrompt.version
+        version: data.content ? currentPrompt.version + 1 : currentPrompt.version,
+        tags: data.tags || currentPrompt.tags
       },
       include: {
         project: {

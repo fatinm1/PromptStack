@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PromptEditor } from '@/components/prompt-editor'
+import { useRouter } from 'next/navigation'
 import { 
   Code, 
   Plus, 
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react'
 
 export default function PromptsPage() {
+  const router = useRouter()
   const [prompts, setPrompts] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
   const [searchQuery, setSearchQuery] = React.useState('')
@@ -62,7 +64,7 @@ export default function PromptsPage() {
             Create, edit, and manage your LLM prompts
           </p>
         </div>
-        <Button>
+        <Button onClick={() => router.push('/dashboard/prompts/create')}>
           <Plus className="mr-2 h-4 w-4" />
           New Prompt
         </Button>
@@ -111,9 +113,21 @@ export default function PromptsPage() {
                     {prompt.description}
                   </CardDescription>
                 </div>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(`/dashboard/prompts/${prompt.id}/test`)
+                    }}
+                  >
+                    Test
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -178,7 +192,10 @@ export default function PromptsPage() {
                 : 'Create your first prompt to start building AI applications. Prompts are the building blocks of your AI workflows.'
               }
             </p>
-            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary">
+            <Button 
+              className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary"
+              onClick={() => router.push('/dashboard/prompts/create')}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Prompt
             </Button>

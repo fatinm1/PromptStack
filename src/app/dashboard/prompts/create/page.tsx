@@ -5,105 +5,117 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
-import { PromptEditor } from '@/components/prompt-editor'
 import { 
   ArrowLeft,
   Save,
   Play,
-  Settings,
   Code,
-  FileText,
-  Tag
+  Settings,
+  Loader2,
+  AlertCircle
 } from 'lucide-react'
+
+interface CreatePromptData {
+  name: string
+  description: string
+  content: string
+  model: string
+  temperature: number
+  maxTokens: number
+  tags: string
+  projectId: string
+}
 
 export default function CreatePromptPage() {
   const { user } = useAuth()
   const router = useRouter()
-  const [promptData, setPromptData] = useState({
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [projects, setProjects] = useState<any[]>([])
+  const [formData, setFormData] = useState<CreatePromptData>({
     name: '',
     description: '',
     content: '',
-    tags: '',
     model: 'gpt-3.5-turbo',
     temperature: 0.7,
-    maxTokens: 4096
+    maxTokens: 1000,
+    tags: '',
+    projectId: ''
   })
-  const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
 
-  const handleSave = async () => {
-    if (!promptData.name.trim() || !promptData.content.trim()) {
-      alert('Please fill in the name and content fields')
+  React.useEffect(() => {
+    if (user) {
+      loadProjects()
+    }
+  }, [user])
+
+  const loadProjects = async () => {
+    try {
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch('/api/projects', { headers })
+      if (response.ok) {
+        const data = await response.json()
+        setProjects(data.projects || [])
+        if (data.projects && data.projects.length > 0) {
+          setFormData(prev => ({ ...prev, projectId: data.projects[0].id }))
+        }
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!formData.name.trim() || !formData.content.trim() || !formData.projectId) {
+      alert('Please fill in all required fields')
       return
     }
 
-    setSaving(true)
     try {
+      setSaving(true)
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
       const response = await fetch('/api/prompts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...headers
         },
-        body: JSON.stringify({
-          name: promptData.name,
-          description: promptData.description,
-          content: promptData.content,
-          tags: promptData.tags,
-          model: promptData.model,
-          temperature: promptData.temperature,
-          maxTokens: promptData.maxTokens
-        }),
+        body: JSON.stringify(formData)
       })
 
       if (response.ok) {
-        const result = await response.json()
-        router.push(`/dashboard/prompts/${result.prompt.id}`)
+        const data = await response.json()
+        router.push(`/dashboard/prompts/${data.id}/test`)
       } else {
-        throw new Error('Failed to create prompt')
+        const error = await response.json()
+        alert(error.error || 'Failed to create prompt')
       }
     } catch (error) {
       console.error('Error creating prompt:', error)
-      alert('Failed to create prompt. Please try again.')
+      alert('Failed to create prompt')
     } finally {
       setSaving(false)
     }
   }
 
   const handleTest = async () => {
-    if (!promptData.content.trim()) {
-      alert('Please enter some prompt content')
+    if (!formData.content.trim()) {
+      alert('Please enter a prompt content first')
       return
     }
 
-    setLoading(true)
-    try {
-      const response = await fetch('/api/prompts/test', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: promptData.content,
-          model: promptData.model,
-          temperature: promptData.temperature,
-          maxTokens: promptData.maxTokens
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-        alert(`Test completed! Response: ${result.output}`)
-      } else {
-        throw new Error('Test failed')
-      }
-    } catch (error) {
-      console.error('Test error:', error)
-      alert('Test failed. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+    // For now, just show a preview
+    alert('Test functionality will be available after saving the prompt')
   }
 
   if (!user) {
@@ -124,213 +136,239 @@ export default function CreatePromptPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push('/dashboard/prompts')}
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            Back to Prompts
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Create New Prompt</h1>
-            <p className="text-muted-foreground">
-              Build and test your AI prompts
-            </p>
+            <p className="text-muted-foreground">Create a new LLM prompt for your project</p>
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleTest} disabled={loading}>
-            <Play className="w-4 h-4 mr-2" />
-            {loading ? 'Testing...' : 'Test Prompt'}
-          </Button>
-          <Button onClick={handleSave} disabled={saving}>
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Prompt'}
-          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Editor */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Prompt Details */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Prompt Details
+              <CardTitle className="flex items-center">
+                <Code className="w-5 h-5 mr-2" />
+                Basic Information
               </CardTitle>
               <CardDescription>
-                Basic information about your prompt
+                Set the name, description, and project for your prompt
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">Prompt Name *</Label>
                 <Input
                   id="name"
-                  value={promptData.name}
-                  onChange={(e) => setPromptData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Enter prompt name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., Email Generator, Code Assistant"
+                  required
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Input
+                <Textarea
                   id="description"
-                  value={promptData.description}
-                  onChange={(e) => setPromptData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe what this prompt does"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe what this prompt does..."
+                  rows={3}
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="project">Project *</Label>
+                <Select
+                  value={formData.projectId}
+                  onValueChange={(value) => setFormData({ ...formData, projectId: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {projects.length === 0 && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      No projects available. Create a project first.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => router.push('/dashboard/projects/create')}
+                    >
+                      Create Project
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="tags">Tags</Label>
                 <Input
                   id="tags"
-                  value={promptData.tags}
-                  onChange={(e) => setPromptData(prev => ({ ...prev, tags: e.target.value }))}
-                  placeholder="customer-support, responses, ai"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  placeholder="email, automation, customer-service"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Separate tags with commas
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Prompt Editor */}
+          {/* Model Configuration */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code className="h-4 w-4" />
-                Prompt Content
+              <CardTitle className="flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                Model Configuration
               </CardTitle>
               <CardDescription>
-                Write your prompt with variables like {'{user_input}'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PromptEditor
-                initialContent={promptData.content}
-                onSave={(content) => setPromptData(prev => ({ ...prev, content }))}
-                onTest={handleTest}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Settings Panel */}
-        <div className="space-y-6">
-          {/* Model Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Model Settings
-              </CardTitle>
-              <CardDescription>
-                Configure the AI model parameters
+                Configure the AI model and parameters
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="model">Model</Label>
-                <select
-                  id="model"
-                  value={promptData.model}
-                  onChange={(e) => setPromptData(prev => ({ ...prev, model: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                <Select
+                  value={formData.model}
+                  onValueChange={(value) => setFormData({ ...formData, model: value })}
                 >
-                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                  <option value="gpt-4">GPT-4</option>
-                  <option value="claude-3">Claude-3</option>
-                  <option value="claude-2">Claude-2</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                    <SelectItem value="gpt-4">GPT-4</SelectItem>
+                    <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                    <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                    <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="temperature">Temperature</Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    id="temperature"
-                    type="range"
-                    min="0"
-                    max="2"
-                    step="0.1"
-                    value={promptData.temperature}
-                    onChange={(e) => setPromptData(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
-                    className="flex-1"
-                  />
-                  <span className="text-sm font-medium w-12">
-                    {promptData.temperature}
-                  </span>
+                <Label>Temperature: {formData.temperature}</Label>
+                <input
+                  type="range"
+                  min="0"
+                  max="2"
+                  step="0.1"
+                  value={formData.temperature}
+                  onChange={(e) => setFormData({ ...formData, temperature: parseFloat(e.target.value) })}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Focused</span>
+                  <span>Creative</span>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Higher values make output more creative, lower values make it more focused
-                </p>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="maxTokens">Max Tokens</Label>
+                <Label htmlFor="max-tokens">Max Tokens</Label>
                 <Input
-                  id="maxTokens"
+                  id="max-tokens"
                   type="number"
+                  value={formData.maxTokens}
+                  onChange={(e) => setFormData({ ...formData, maxTokens: parseInt(e.target.value) })}
                   min="1"
-                  max="8192"
-                  value={promptData.maxTokens}
-                  onChange={(e) => setPromptData(prev => ({ ...prev, maxTokens: parseInt(e.target.value) }))}
+                  max="4000"
                 />
               </div>
             </CardContent>
           </Card>
-
-          {/* Variables */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Tag className="h-4 w-4" />
-                Variables
-              </CardTitle>
-              <CardDescription>
-                Available variables in your prompt
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
-                  <code className="text-sm">{'{user_input}'}</code>
-                  <span className="text-xs text-muted-foreground">User input</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
-                  <code className="text-sm">{'{context}'}</code>
-                  <span className="text-xs text-muted-foreground">Context</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
-                  <code className="text-sm">{'{tone}'}</code>
-                  <span className="text-xs text-muted-foreground">Tone</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
-                  <code className="text-sm">{'{style}'}</code>
-                  <span className="text-xs text-muted-foreground">Style</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                <FileText className="w-4 h-4 mr-2" />
-                Save as Template
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Code className="w-4 h-4 mr-2" />
-                Export Prompt
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Settings className="w-4 h-4 mr-2" />
-                Advanced Settings
-              </Button>
-            </CardContent>
-          </Card>
         </div>
-      </div>
+
+        {/* Prompt Content */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Prompt Content *</CardTitle>
+            <CardDescription>
+              Write your prompt. Use {'{{variable}}'} syntax for dynamic inputs.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="content">Prompt Template</Label>
+              <Textarea
+                id="content"
+                value={formData.content}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                placeholder="Write a {{tone}} email to {{recipient} about {{subject}}..."
+                rows={8}
+                className="font-mono"
+                required
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Use {'{{variable}}'} syntax for dynamic inputs
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTest}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Test Prompt
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push('/dashboard/prompts')}
+          >
+            Cancel
+          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              type="submit"
+              disabled={saving || !formData.name.trim() || !formData.content.trim() || !formData.projectId}
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Create Prompt
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </form>
     </div>
   )
 } 

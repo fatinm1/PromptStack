@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   description: 'Collaborate, version control, and test your LLM prompts with the power of Git-like workflows.',
   keywords: ['LLM', 'prompts', 'AI', 'version control', 'collaboration', 'workflow'],
   authors: [{ name: 'PromptStack Team' }],
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
 }
 
 export const viewport = {

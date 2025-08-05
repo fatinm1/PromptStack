@@ -19,6 +19,7 @@ import {
   Users,
   Settings
 } from 'lucide-react'
+import { Logo } from '@/components/logo'
 
 const navigation = [
   {
@@ -90,13 +91,10 @@ export function Sidebar() {
     )}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
-        {!collapsed && (
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded-lg flex items-center justify-center">
-              <Code className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold gradient-text">PromptStack</span>
-          </div>
+        {!collapsed ? (
+          <Logo size="sm" showText={true} />
+        ) : (
+          <Logo size="sm" showText={false} />
         )}
         <Button
           variant="ghost"
