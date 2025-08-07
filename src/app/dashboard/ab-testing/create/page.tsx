@@ -38,7 +38,10 @@ export default function CreateABTestPage() {
 
   const fetchPrompts = async () => {
     try {
-      const response = await fetch('/api/prompts')
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch('/api/prompts', { headers })
       if (response.ok) {
         const data = await response.json()
         setPrompts(data.prompts || [])
@@ -56,15 +59,23 @@ export default function CreateABTestPage() {
 
     setLoading(true)
     try {
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (userId) {
+        headers['Authorization'] = `Bearer ${userId}`
+      }
+      
       const response = await fetch('/api/ab-tests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           name: formData.name,
           description: formData.description,
           promptAId: formData.promptAId,
           promptBId: formData.promptBId,
-          testInputs: formData.testInputs.filter(input => input.trim()),
+          promptAVersion: selectedPromptA?.version || 1,
+          promptBVersion: selectedPromptB?.version || 1,
+          testInputs: formData.testInputs.filter(input => input.trim()).join('\n'),
           status: formData.status
         })
       })

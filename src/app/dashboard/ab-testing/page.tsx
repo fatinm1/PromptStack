@@ -4,6 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useRouter } from 'next/navigation'
 import { 
   BarChart3, 
   Plus, 
@@ -17,40 +18,77 @@ import {
 } from 'lucide-react'
 
 export default function ABTestingPage() {
+  const router = useRouter()
   const [abTests, setAbTests] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
   const [selectedTest, setSelectedTest] = React.useState<string | null>(null)
   const [testInput, setTestInput] = React.useState('')
   const [isRunning, setIsRunning] = React.useState(false)
 
-  React.useEffect(() => {
-    const fetchABTests = async () => {
-      try {
-        setLoading(true)
-        
-        // Get user ID from localStorage
-        const userId = localStorage.getItem('userId')
-        const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
-        
-        const response = await fetch('/api/ab-tests', { headers })
-        if (response.ok) {
-          const data = await response.json()
-          setAbTests(data.abTests || [])
-        }
-      } catch (error) {
-        console.error('Error fetching A/B tests:', error)
-      } finally {
-        setLoading(false)
+  const fetchABTests = async () => {
+    try {
+      setLoading(true)
+      
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch('/api/ab-tests', { headers })
+      if (response.ok) {
+        const data = await response.json()
+        setAbTests(data.abTests || [])
       }
+    } catch (error) {
+      console.error('Error fetching A/B tests:', error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  React.useEffect(() => {
     fetchABTests()
   }, [])
 
-  const handleRunTest = () => {
+  const handleRunTest = async () => {
+    if (!selectedTest || !testInput.trim()) {
+      alert('Please select a test and enter test input')
+      return
+    }
+
     setIsRunning(true)
-    // Simulate API call
-    setTimeout(() => setIsRunning(false), 3000)
+    try {
+      const userId = localStorage.getItem('userId')
+      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+      
+      const response = await fetch(`/api/ab-tests/${selectedTest}/run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers
+        },
+        body: JSON.stringify({
+          testInputs: [testInput],
+          model: 'gpt-3.5-turbo',
+          temperature: 0.7
+        })
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('A/B test results:', result)
+        alert(`Test completed! Winner: ${result.summary.overallWinner}`)
+        // Refresh the tests list
+        fetchABTests()
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Test failed')
+      }
+    } catch (error) {
+      console.error('Error running A/B test:', error)
+      alert('Failed to run test. Please try again.')
+    } finally {
+      setIsRunning(false)
+    }
   }
 
   return (
@@ -63,7 +101,7 @@ export default function ABTestingPage() {
             Compare prompt versions and find the best performing ones
           </p>
         </div>
-        <Button>
+        <Button onClick={() => router.push('/dashboard/ab-testing/create')}>
           <Plus className="mr-2 h-4 w-4" />
           New A/B Test
         </Button>
@@ -92,7 +130,10 @@ export default function ABTestingPage() {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Create your first A/B test to compare different prompt versions and find the best performing ones.
             </p>
-            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary">
+            <Button 
+              className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary"
+              onClick={() => router.push('/dashboard/ab-testing/create')}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Create Your First A/B Test
             </Button>
@@ -158,11 +199,11 @@ export default function ABTestingPage() {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setSelectedTest(test.id)}
+                      onClick={() => router.push(`/dashboard/ab-testing/${test.id}`)}
                     >
                       View Details
                     </Button>
-                    {test.status === 'running' && (
+                    {test.status === 'RUNNING' && (
                       <Button size="sm" disabled>
                         <Play className="w-4 h-4 mr-2" />
                         Running

@@ -206,8 +206,7 @@ export default function HomePage() {
   }
 
   const handleWatchDemo = () => {
-    // For now, just show an alert
-    alert('Demo video would play here!')
+    router.push('/demo')
   }
 
   const handlePricing = () => {
@@ -310,7 +309,7 @@ export default function HomePage() {
             </Button>
             <Button variant="outline" size="lg" onClick={handleWatchDemo} className="group hover:bg-promptstack-primary/10 hover:border-promptstack-primary/30 transition-all duration-300 px-8 py-6 text-lg font-semibold linear-backdrop linear-border-glow">
               <Play className="mr-3 w-5 h-5" />
-              Watch Demo
+              Demo
             </Button>
           </div>
 
@@ -350,23 +349,23 @@ export default function HomePage() {
                       </div>
                       
                       <nav className="space-y-2">
-                        <div className="flex items-center space-x-3 px-3 py-2 bg-accent rounded-md cursor-pointer hover:bg-accent/80 transition-colors">
+                        <div className="flex items-center space-x-3 px-3 py-2 bg-accent rounded-md">
                           <Code className="w-4 h-4" />
                           <span className="text-sm font-medium">Prompts</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
                           <GitBranch className="w-4 h-4" />
                           <span className="text-sm">Version Control</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
                           <BarChart3 className="w-4 h-4" />
                           <span className="text-sm">A/B Testing</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
                           <Users className="w-4 h-4" />
                           <span className="text-sm">Team</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
                           <TrendingUp className="w-4 h-4" />
                           <span className="text-sm">Analytics</span>
                         </div>
@@ -381,11 +380,11 @@ export default function HomePage() {
                           <p className="text-sm text-muted-foreground">GPT-4 • Temperature: 0.7</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700 cursor-pointer">
+                          <Button size="sm" className="bg-green-600">
                             <Play className="w-4 h-4 mr-1" />
                             Test
                           </Button>
-                          <Button variant="outline" size="sm" className="cursor-pointer">
+                          <Button variant="outline" size="sm">
                             <GitBranch className="w-4 h-4 mr-1" />
                             v1.2
                           </Button>
@@ -415,17 +414,17 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Interactive results panel */}
+                      {/* Static results panel */}
                       <div className="mt-4 grid grid-cols-3 gap-4">
-                        <div className="bg-card/50 rounded-lg p-3 cursor-pointer hover:bg-card/70 transition-colors">
+                        <div className="bg-card/50 rounded-lg p-3">
                           <div className="text-2xl font-bold text-green-500">99.2%</div>
                           <div className="text-xs text-muted-foreground">Success Rate</div>
                         </div>
-                        <div className="bg-card/50 rounded-lg p-3 cursor-pointer hover:bg-card/70 transition-colors">
+                        <div className="bg-card/50 rounded-lg p-3">
                           <div className="text-2xl font-bold text-blue-500">1.8s</div>
                           <div className="text-xs text-muted-foreground">Avg Latency</div>
                         </div>
-                        <div className="bg-card/50 rounded-lg p-3 cursor-pointer hover:bg-card/70 transition-colors">
+                        <div className="bg-card/50 rounded-lg p-3">
                           <div className="text-2xl font-bold text-purple-500">$0.004</div>
                           <div className="text-xs text-muted-foreground">Cost/Test</div>
                         </div>
