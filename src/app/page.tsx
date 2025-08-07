@@ -281,13 +281,13 @@ export default function HomePage() {
             <span className="text-sm font-medium text-promptstack-primary">The Future of Prompt Engineering</span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-6 animate-fade-in leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in leading-tight">
             <span className="linear-gradient-text">GitHub</span>
             <br />
             <span className="text-foreground">for LLM Prompts</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto animate-fade-in leading-relaxed" style={{ animationDelay: '0.2s' }}>
+          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto animate-fade-in leading-relaxed" style={{ animationDelay: '0.2s' }}>
             <ClientOnly>
               <AdvancedTypingAnimation 
                 lines={[
@@ -296,19 +296,19 @@ export default function HomePage() {
                 ]}
                 speed={50}
                 delay={2000}
-                className="text-xl md:text-2xl text-muted-foreground"
+                className="text-lg md:text-xl lg:text-2xl text-muted-foreground"
               />
             </ClientOnly>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <Button size="lg" className="group linear-button bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90 text-white linear-shadow hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-8 py-6 text-lg font-semibold" onClick={handleGetStarted}>
-              <Rocket className="mr-3 w-6 h-6" />
+            <Button size="lg" className="group linear-button bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90 text-white linear-shadow hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-6 py-4 text-base font-semibold" onClick={handleGetStarted}>
+              <Rocket className="mr-2 w-5 h-5" />
               Start Building
-              <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg" onClick={handleWatchDemo} className="group hover:bg-promptstack-primary/10 hover:border-promptstack-primary/30 transition-all duration-300 px-8 py-6 text-lg font-semibold linear-backdrop linear-border-glow">
-              <Play className="mr-3 w-5 h-5" />
+            <Button variant="outline" size="lg" onClick={handleWatchDemo} className="group hover:bg-promptstack-primary/10 hover:border-promptstack-primary/30 transition-all duration-300 px-6 py-4 text-base font-semibold linear-backdrop linear-border-glow">
+              <Play className="mr-2 w-4 h-4" />
               Demo
             </Button>
           </div>
@@ -325,88 +325,88 @@ export default function HomePage() {
                 {/* Window frame */}
                 <div className="bg-card/90 linear-backdrop rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
                   {/* Window controls */}
-                  <div className="flex items-center justify-between p-4 border-b border-border/50 bg-card/50">
+                  <div className="flex items-center justify-between p-3 md:p-4 border-b border-border/50 bg-card/50">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                       <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <span>PromptStack</span>
+                    <div className="flex items-center space-x-2 md:space-x-4 text-xs md:text-sm text-muted-foreground">
+                      <span className="hidden sm:inline">PromptStack</span>
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     </div>
                   </div>
 
                   {/* App content */}
-                  <div className="flex h-96">
+                  <div className="flex flex-col md:flex-row h-auto md:h-96">
                     {/* Sidebar */}
-                    <div className="w-64 bg-card/50 border-r border-border/50 p-4">
-                      <div className="flex items-center space-x-2 mb-6">
-                        <div className="w-8 h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded-lg flex items-center justify-center">
-                          <Code className="w-5 h-5 text-white" />
+                    <div className="w-full md:w-64 bg-card/50 border-b md:border-b-0 md:border-r border-border/50 p-3 md:p-4">
+                      <div className="flex items-center space-x-2 mb-4 md:mb-6">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded-lg flex items-center justify-center">
+                          <Code className="w-3 h-3 md:w-5 md:h-5 text-white" />
                         </div>
-                        <span className="font-bold">PromptStack</span>
+                        <span className="font-bold text-sm md:text-base">PromptStack</span>
                       </div>
                       
-                      <nav className="space-y-2">
-                        <div className="flex items-center space-x-3 px-3 py-2 bg-accent rounded-md">
-                          <Code className="w-4 h-4" />
-                          <span className="text-sm font-medium">Prompts</span>
+                      <nav className="space-y-1 md:space-y-2">
+                        <div className="flex items-center space-x-2 md:space-x-3 px-2 md:px-3 py-1 md:py-2 bg-accent rounded-md">
+                          <Code className="w-3 h-3 md:w-4 md:h-4" />
+                          <span className="text-xs md:text-sm font-medium">Prompts</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
-                          <GitBranch className="w-4 h-4" />
-                          <span className="text-sm">Version Control</span>
+                        <div className="flex items-center space-x-2 md:space-x-3 px-2 md:px-3 py-1 md:py-2 text-muted-foreground">
+                          <GitBranch className="w-3 h-3 md:w-4 md:h-4" />
+                          <span className="text-xs md:text-sm">Version Control</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
-                          <BarChart3 className="w-4 h-4" />
-                          <span className="text-sm">A/B Testing</span>
+                        <div className="flex items-center space-x-2 md:space-x-3 px-2 md:px-3 py-1 md:py-2 text-muted-foreground">
+                          <BarChart3 className="w-3 h-3 md:w-4 md:h-4" />
+                          <span className="text-xs md:text-sm">A/B Testing</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span className="text-sm">Team</span>
+                        <div className="flex items-center space-x-2 md:space-x-3 px-2 md:px-3 py-1 md:py-2 text-muted-foreground">
+                          <Users className="w-3 h-3 md:w-4 md:h-4" />
+                          <span className="text-xs md:text-sm">Team</span>
                         </div>
-                        <div className="flex items-center space-x-3 px-3 py-2 text-muted-foreground">
-                          <TrendingUp className="w-4 h-4" />
-                          <span className="text-sm">Analytics</span>
+                        <div className="flex items-center space-x-2 md:space-x-3 px-2 md:px-3 py-1 md:py-2 text-muted-foreground">
+                          <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
+                          <span className="text-xs md:text-sm">Analytics</span>
                         </div>
                       </nav>
                     </div>
 
                     {/* Main content */}
-                    <div className="flex-1 p-6">
-                      <div className="flex items-center justify-between mb-6">
+                    <div className="flex-1 p-3 md:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 space-y-2 sm:space-y-0">
                         <div>
-                          <h3 className="text-lg font-semibold">Prompt Editor</h3>
-                          <p className="text-sm text-muted-foreground">GPT-4 • Temperature: 0.7</p>
+                          <h3 className="text-base md:text-lg font-semibold">Prompt Editor</h3>
+                          <p className="text-xs md:text-sm text-muted-foreground">GPT-4 • Temperature: 0.7</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Button size="sm" className="bg-green-600">
-                            <Play className="w-4 h-4 mr-1" />
+                          <Button size="sm" className="bg-green-600 text-xs md:text-sm">
+                            <Play className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                             Test
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <GitBranch className="w-4 h-4 mr-1" />
+                          <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                            <GitBranch className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                             v1.2
                           </Button>
                         </div>
                       </div>
 
                       {/* Interactive code editor */}
-                      <div className="bg-background border border-border rounded-lg p-4 font-mono text-sm">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-muted-foreground">customer-support-prompt.md</span>
-                          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                      <div className="bg-background border border-border rounded-lg p-3 md:p-4 font-mono text-xs md:text-sm">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
+                          <span className="text-muted-foreground text-xs md:text-sm">customer-support-prompt.md</span>
+                          <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1 sm:mt-0">
                             <span>GPT-4</span>
                             <span>•</span>
                             <span>247 tokens</span>
                           </div>
                         </div>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-1 md:space-y-2">
                           <div className="text-blue-500">You are a helpful customer support assistant for TechCorp...</div>
-                          <div className="text-green-600 pl-4">Your role is to help customers with technical issues.</div>
-                          <div className="text-green-600 pl-4">Customer query: {`{customer_query}`}</div>
-                          <div className="text-green-600 pl-4">Please provide a helpful, professional response.</div>
+                          <div className="text-green-600 pl-2 md:pl-4">Your role is to help customers with technical issues.</div>
+                          <div className="text-green-600 pl-2 md:pl-4">Customer query: {`{customer_query}`}</div>
+                          <div className="text-green-600 pl-2 md:pl-4">Please provide a helpful, professional response.</div>
                           <div className="text-blue-500">---</div>
                           <div className="text-gray-500">// Testing with sample query...</div>
                           <div className="text-green-600">✓ Response generated in 1.8s</div>
@@ -415,17 +415,17 @@ export default function HomePage() {
                       </div>
 
                       {/* Static results panel */}
-                      <div className="mt-4 grid grid-cols-3 gap-4">
-                        <div className="bg-card/50 rounded-lg p-3">
-                          <div className="text-2xl font-bold text-green-500">99.2%</div>
+                      <div className="mt-3 md:mt-4 grid grid-cols-3 gap-2 md:gap-4">
+                        <div className="bg-card/50 rounded-lg p-2 md:p-3">
+                          <div className="text-lg md:text-2xl font-bold text-green-500">99.2%</div>
                           <div className="text-xs text-muted-foreground">Success Rate</div>
                         </div>
-                        <div className="bg-card/50 rounded-lg p-3">
-                          <div className="text-2xl font-bold text-blue-500">1.8s</div>
+                        <div className="bg-card/50 rounded-lg p-2 md:p-3">
+                          <div className="text-lg md:text-2xl font-bold text-blue-500">1.8s</div>
                           <div className="text-xs text-muted-foreground">Avg Latency</div>
                         </div>
-                        <div className="bg-card/50 rounded-lg p-3">
-                          <div className="text-2xl font-bold text-purple-500">$0.004</div>
+                        <div className="bg-card/50 rounded-lg p-2 md:p-3">
+                          <div className="text-lg md:text-2xl font-bold text-purple-500">$0.004</div>
                           <div className="text-xs text-muted-foreground">Cost/Test</div>
                         </div>
                       </div>
@@ -470,10 +470,10 @@ export default function HomePage() {
             <Lightbulb className="w-4 h-4 text-promptstack-primary" />
             <span className="text-sm font-medium text-promptstack-primary">Powerful Features</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Everything you need to build with LLMs
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
             From prompt versioning to A/B testing, PromptStack provides the tools teams need to build reliable AI applications.
           </p>
         </div>
@@ -520,11 +520,11 @@ export default function HomePage() {
             <Card key={feature.title} className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
               <CardHeader className="relative">
-                <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className="w-6 h-6 text-white" />
+                <div className={`w-10 h-10 bg-gradient-to-br ${feature.gradient} rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                  <feature.icon className="w-5 h-5 text-white" />
                 </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
-                <CardDescription className="text-base">
+                <CardTitle className="text-lg">{feature.title}</CardTitle>
+                <CardDescription className="text-sm">
                   {feature.description}
                 </CardDescription>
               </CardHeader>
@@ -536,54 +536,55 @@ export default function HomePage() {
       {/* Interactive Demo Section */}
       <section className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             See PromptStack in Action
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             Experience the power of collaborative prompt engineering with our interactive demo.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+          {/* Left Section - Features */}
+          <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-6">
-              <div className="flex items-center space-x-4 group">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="flex items-start space-x-4 group">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                   <CheckCircle className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Real-time Collaboration</h3>
-                  <p className="text-muted-foreground">Multiple team members can edit prompts simultaneously with live cursors and comments</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg mb-2">Real-time Collaboration</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Multiple team members can edit prompts simultaneously with live cursors and comments</p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-4 group">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="flex items-start space-x-4 group">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Live Testing & Debugging</h3>
-                  <p className="text-muted-foreground">Test prompts instantly with multiple AI models and real-time performance metrics</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg mb-2">Live Testing & Debugging</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Test prompts instantly with multiple AI models and real-time performance metrics</p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-4 group">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="flex items-start space-x-4 group">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                   <Target className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">A/B Testing Suite</h3>
-                  <p className="text-muted-foreground">Compare prompt versions with statistical analysis and automated winner selection</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg mb-2">A/B Testing Suite</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Compare prompt versions with statistical analysis and automated winner selection</p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4 group">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="flex items-start space-x-4 group">
+                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                   <Database className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Dataset Management</h3>
-                  <p className="text-muted-foreground">Upload and manage test datasets for comprehensive prompt validation</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg mb-2">Dataset Management</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Upload and manage test datasets for comprehensive prompt validation</p>
                 </div>
               </div>
             </div>
@@ -612,9 +613,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          {/* Right Section - Interactive Demo */}
+          <div className="space-y-6 order-1 lg:order-2">
             {/* Interactive Code Editor */}
-            <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6 shadow-2xl">
+            <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -642,7 +644,7 @@ export default function HomePage() {
             </div>
 
             {/* A/B Test Results */}
-            <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6 shadow-2xl">
+            <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-semibold">A/B Test Results</h4>
                 <div className="flex items-center space-x-2">
@@ -670,7 +672,7 @@ export default function HomePage() {
             </div>
 
             {/* Team Collaboration */}
-            <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6 shadow-2xl">
+            <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-2xl border border-border/50 p-6 shadow-2xl hover:shadow-3xl transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-semibold">Team Activity</h4>
                 <div className="flex -space-x-2">
@@ -700,27 +702,27 @@ export default function HomePage() {
 
         {/* Interactive Features Grid */}
         <div className="mt-16 grid md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 hover:scale-105 transition-transform duration-300">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mb-4">
-              <GitPullRequest className="w-6 h-6 text-white" />
+          <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-4 hover:scale-105 transition-transform duration-300">
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mb-3">
+              <GitPullRequest className="w-5 h-5 text-white" />
             </div>
-            <h4 className="font-semibold mb-2">Version Control</h4>
+            <h4 className="font-semibold mb-2 text-base">Version Control</h4>
             <p className="text-sm text-muted-foreground">Git-like branching, merging, and diff views for prompt management</p>
           </div>
 
-          <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 hover:scale-105 transition-transform duration-300">
-            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mb-4">
-              <BarChart3 className="w-6 h-6 text-white" />
+          <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-4 hover:scale-105 transition-transform duration-300">
+            <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mb-3">
+              <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <h4 className="font-semibold mb-2">Analytics Dashboard</h4>
+            <h4 className="font-semibold mb-2 text-base">Analytics Dashboard</h4>
             <p className="text-sm text-muted-foreground">Real-time metrics, cost tracking, and performance insights</p>
           </div>
 
-          <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 hover:scale-105 transition-transform duration-300">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
-              <Zap className="w-6 h-6 text-white" />
+          <div className="bg-gradient-to-br from-card to-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-4 hover:scale-105 transition-transform duration-300">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-3">
+              <Zap className="w-5 h-5 text-white" />
             </div>
-            <h4 className="font-semibold mb-2">CI/CD Pipeline</h4>
+            <h4 className="font-semibold mb-2 text-base">CI/CD Pipeline</h4>
             <p className="text-sm text-muted-foreground">Automated testing and deployment workflows for prompts</p>
           </div>
         </div>
@@ -742,10 +744,10 @@ export default function HomePage() {
             <Users className="w-4 h-4 text-promptstack-primary" />
             <span className="text-sm font-medium text-promptstack-primary">Customer Stories</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             What Users Say
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             Join thousands of developers and teams already using PromptStack
           </p>
         </div>
@@ -755,11 +757,11 @@ export default function HomePage() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
             <CardContent className="p-6 relative">
               <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-white font-semibold">S</span>
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white font-semibold text-sm">S</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-lg">Sarah Chen</h4>
+                  <h4 className="font-semibold text-base">Sarah Chen</h4>
                   <p className="text-sm text-muted-foreground">AI Engineer, TechCorp</p>
                 </div>
               </div>
@@ -841,10 +843,10 @@ export default function HomePage() {
             <Star className="w-4 h-4 text-promptstack-primary" />
             <span className="text-sm font-medium text-promptstack-primary">Simple Pricing</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Simple, transparent pricing
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             Start free and scale as you grow. No hidden fees, no surprises.
           </p>
         </div>
@@ -968,10 +970,10 @@ export default function HomePage() {
             <MessageSquare className="w-4 h-4 text-promptstack-primary" />
             <span className="text-sm font-medium text-promptstack-primary">Common Questions</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Frequently Asked Questions
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             Everything you need to know about PromptStack
           </p>
         </div>
@@ -1024,10 +1026,10 @@ export default function HomePage() {
               <Rocket className="w-4 h-4 text-promptstack-primary" />
               <span className="text-sm font-medium text-promptstack-primary">Ready to Launch?</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
               Ready to build the future of AI?
             </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Join thousands of developers and teams already using PromptStack to build better AI applications.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1052,10 +1054,10 @@ export default function HomePage() {
             <MessageSquare className="w-4 h-4 text-promptstack-primary" />
             <span className="text-sm font-medium text-promptstack-primary">Newsletter</span>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 gradient-text">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Stay Updated
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             Get the latest updates on prompt engineering, AI development, and new PromptStack features
           </p>
         </div>

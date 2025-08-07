@@ -149,10 +149,10 @@ Response:`)
             <Sparkles className="w-4 h-4 text-promptstack-primary" />
             <span className="text-sm font-medium text-promptstack-primary">Interactive Demo</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 gradient-text">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 gradient-text">
             Experience PromptStack
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto">
             Explore the powerful features that make PromptStack the ultimate platform for prompt engineering and AI development.
           </p>
         </div>

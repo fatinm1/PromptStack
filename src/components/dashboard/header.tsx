@@ -72,7 +72,7 @@ export function Header() {
             </Button>
 
             {/* New Prompt */}
-            <Button size="sm" className="gap-2">
+            <Button size="sm" className="gap-2 text-sm">
               <Plus className="h-4 w-4" />
               New Prompt
             </Button>

@@ -122,8 +122,8 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div>
-        <h1 className="text-3xl font-bold">Welcome back, {user.name}!</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold">Welcome back, {user.name}!</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Here's what's happening with your prompts today.
         </p>
       </div>
@@ -132,8 +132,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Plus className="w-4 h-4" />
               Create New Project
             </CardTitle>
             <CardDescription>
@@ -149,8 +149,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FolderOpen className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-base">
+              <FolderOpen className="w-4 h-4" />
               Open Projects
             </CardTitle>
             <CardDescription>
@@ -166,8 +166,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BarChart3 className="w-4 h-4" />
               Analytics
             </CardTitle>
             <CardDescription>
@@ -183,8 +183,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Settings className="w-4 h-4" />
               Settings
             </CardTitle>
             <CardDescription>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
       {/* Analytics Overview */}
       {analytics && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Analytics Overview</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-4">Analytics Overview</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4">
@@ -210,7 +210,7 @@ export default function DashboardPage() {
                   <Code className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Total Prompts</p>
-                    <p className="text-2xl font-bold">{analytics.totalPrompts}</p>
+                    <p className="text-xl md:text-2xl font-bold">{analytics.totalPrompts}</p>
                   </div>
                 </div>
               </CardContent>
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                   <BarChart3 className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Test Runs</p>
-                    <p className="text-2xl font-bold">{analytics.totalTestRuns}</p>
+                    <p className="text-xl md:text-2xl font-bold">{analytics.totalTestRuns}</p>
                   </div>
                 </div>
               </CardContent>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                   <TrendingUp className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Success Rate</p>
-                    <p className="text-2xl font-bold">{analytics.successRate.toFixed(1)}%</p>
+                    <p className="text-xl md:text-2xl font-bold">{analytics.successRate.toFixed(1)}%</p>
                   </div>
                 </div>
               </CardContent>
@@ -246,7 +246,7 @@ export default function DashboardPage() {
                   <Users className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Total Cost</p>
-                    <p className="text-2xl font-bold">${analytics.totalCost.toFixed(2)}</p>
+                    <p className="text-xl md:text-2xl font-bold">${analytics.totalCost.toFixed(2)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -279,12 +279,12 @@ export default function DashboardPage() {
       {/* Recent Projects */}
       {projects.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Recent Projects</h2>
+          <h2 className="text-lg md:text-xl font-semibold mb-4">Recent Projects</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {projects.slice(0, 6).map((project) => (
               <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow">
                 <CardHeader>
-                  <CardTitle className="text-lg">{project.name}</CardTitle>
+                  <CardTitle className="text-base">{project.name}</CardTitle>
                   <CardDescription>{project.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
