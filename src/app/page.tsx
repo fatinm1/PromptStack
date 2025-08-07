@@ -442,22 +442,22 @@ export default function HomePage() {
       <section className="py-16 bg-muted/20">
         <div className="container mx-auto px-4 text-center">
           <p className="text-muted-foreground mb-8 text-lg">Trusted by teams at</p>
-          <div className="flex justify-center items-center space-x-12 opacity-60">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded"></div>
-              <span className="font-semibold">TechCorp</span>
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-12 opacity-80 hover:opacity-100 transition-opacity duration-300">
+            <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"></div>
+              <span className="font-semibold text-sm md:text-base group-hover:text-foreground transition-colors duration-300">TechCorp</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded"></div>
-              <span className="font-semibold">AI Labs</span>
+            <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"></div>
+              <span className="font-semibold text-sm md:text-base group-hover:text-foreground transition-colors duration-300">AI Labs</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded"></div>
-              <span className="font-semibold">DataFlow</span>
+            <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-violet-400 to-pink-500 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"></div>
+              <span className="font-semibold text-sm md:text-base group-hover:text-foreground transition-colors duration-300">DataFlow</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded"></div>
-              <span className="font-semibold">NeuralNet</span>
+            <div className="flex items-center space-x-3 group hover:scale-105 transition-transform duration-300">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg shadow-lg group-hover:shadow-xl transition-shadow duration-300"></div>
+              <span className="font-semibold text-sm md:text-base group-hover:text-foreground transition-colors duration-300">NeuralNet</span>
             </div>
           </div>
         </div>
