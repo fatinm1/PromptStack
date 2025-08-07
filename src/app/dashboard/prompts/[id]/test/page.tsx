@@ -120,7 +120,7 @@ export default function PromptTestPage({ params }: { params: { id: string } }) {
       variables.push(match[1])
     }
     
-    return [...new Set(variables)] // Remove duplicates
+    return Array.from(new Set(variables)) // Remove duplicates
   }
 
   const parseTestInput = (input: string): Record<string, any> => {
