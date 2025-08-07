@@ -41,7 +41,7 @@ export default function SignUpPage() {
         <CardHeader>
           <CardTitle>Create Account</CardTitle>
           <CardDescription>
-            Join PromptStack and start building better AI applications
+            Join Promptrix and start building better AI applications
           </CardDescription>
         </CardHeader>
         <CardContent>

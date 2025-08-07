@@ -106,7 +106,7 @@ export default function PromptsPage() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <CardTitle className="flex items-center">
-                    <Code className="w-4 h-4 mr-2 text-promptstack-primary" />
+                    <Code className="w-4 h-4 mr-2 text-promptrix-primary" />
                     {prompt.name}
                   </CardTitle>
                   <CardDescription className="mt-2">
@@ -193,7 +193,7 @@ export default function PromptsPage() {
               }
             </p>
             <Button 
-              className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary"
+              className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary"
               onClick={() => router.push('/dashboard/prompts/create')}
             >
               <Plus className="mr-2 h-4 w-4" />

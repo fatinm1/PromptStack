@@ -107,7 +107,7 @@ export default function ProjectsPage() {
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <div className="flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-promptstack-primary"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-promptrix-primary"></div>
             <span className="text-sm text-muted-foreground">Loading projects...</span>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function ProjectsPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="flex items-center">
-                      <FolderOpen className="w-4 h-4 mr-2 text-promptstack-primary" />
+                      <FolderOpen className="w-4 h-4 mr-2 text-promptrix-primary" />
                       {project.name}
                     </CardTitle>
                     <CardDescription className="mt-2">

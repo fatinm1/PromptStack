@@ -267,7 +267,7 @@ export default function DashboardPage() {
               <p className="text-muted-foreground mb-4">
                 Get started by creating your first project to organize your prompts and datasets.
               </p>
-              <Button onClick={handleCreateProject} className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary">
+              <Button onClick={handleCreateProject} className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Project
               </Button>
@@ -305,7 +305,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>
               <TypingAnimation 
-                text="Welcome to PromptStack!" 
+                text="Welcome to Promptrix!" 
                 speed={100}
                 delay={200}
               />
@@ -317,7 +317,7 @@ export default function DashboardPage() {
           <CardContent>
             {loading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-promptstack-primary"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-promptrix-primary"></div>
                 <span className="ml-2 text-sm text-muted-foreground">Loading dashboard data...</span>
               </div>
             ) : (

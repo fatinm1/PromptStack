@@ -152,7 +152,7 @@ export function PromptEditor({
                     {variablesInContent.map((variable, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-promptstack-primary/10 text-promptstack-primary text-xs rounded-md font-mono"
+                        className="px-2 py-1 bg-promptrix-primary/10 text-promptrix-primary text-xs rounded-md font-mono"
                       >
                         {variable}
                       </span>
@@ -211,7 +211,7 @@ export function PromptEditor({
           <CardContent>
             <div className="flex items-center justify-center py-8">
               <div className="flex items-center space-x-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-promptstack-primary"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-promptrix-primary"></div>
                 <span className="text-sm text-muted-foreground">Running test...</span>
               </div>
             </div>

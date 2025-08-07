@@ -77,7 +77,7 @@
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-promptstack-primary to-promptstack-secondary bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-promptrix-primary to-promptrix-secondary bg-clip-text text-transparent;
   }
   
   /* Dark mode specific styles */

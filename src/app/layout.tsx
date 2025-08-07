@@ -7,10 +7,10 @@ import { ThemeProvider } from '@/components/theme-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PromptStack - GitHub for LLM Prompts & Workflows',
+  title: 'Promptrix - GitHub for LLM Prompts & Workflows',
   description: 'Collaborate, version control, and test your LLM prompts with the power of Git-like workflows.',
   keywords: ['LLM', 'prompts', 'AI', 'version control', 'collaboration', 'workflow'],
-  authors: [{ name: 'PromptStack Team' }],
+  authors: [{ name: 'Promptrix Team' }],
   icons: {
     icon: '/logo.svg',
     shortcut: '/logo.svg',

@@ -209,7 +209,7 @@ export default function TeamPage() {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Invite team members to collaborate on your prompts and projects. You can assign different roles and permissions to each member.
             </p>
-            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary" onClick={handleInviteMember}>
+            <Button className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary" onClick={handleInviteMember}>
               <UserPlus className="mr-2 h-4 w-4" />
               Invite Your First Member
             </Button>

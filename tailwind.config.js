@@ -50,8 +50,8 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // PromptStack custom colors
-        promptstack: {
+        // Promptrix custom colors
+promptrix: {
           primary: "#6366F1", // Indigo
           secondary: "#00BFA6", // Teal
           dark: "#0D1117",

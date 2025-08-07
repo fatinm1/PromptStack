@@ -1,4 +1,4 @@
-# PromptStack - GitHub for LLM Prompts & Workflows
+# Promptrix - GitHub for LLM Prompts & Workflows
 
 A comprehensive platform for managing, versioning, testing, and deploying LLM prompts with team collaboration features.
 
@@ -13,8 +13,8 @@ A comprehensive platform for managing, versioning, testing, and deploying LLM pr
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/fatinm1/PromptStack.git
-   cd PromptStack
+   git clone https://github.com/fatinm1/Promptrix.git
+   cd Promptrix
    ```
 
 2. **Install dependencies**
@@ -150,4 +150,4 @@ If you encounter any issues or have questions:
 
 ---
 
-**PromptStack** - Building the future of AI prompt engineering, one version at a time. 🚀 
+**Promptrix** - Building the future of AI prompt engineering, one version at a time. 🚀 

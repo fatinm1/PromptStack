@@ -145,15 +145,15 @@ Response:`)
       {/* Demo Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-4">
-            <Sparkles className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">Interactive Demo</span>
-          </div>
+                  <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-4">
+          <Sparkles className="w-4 h-4 text-promptrix-primary" />
+          <span className="text-sm font-medium text-promptrix-primary">Interactive Demo</span>
+        </div>
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 gradient-text">
-            Experience PromptStack
+            Experience Promptrix
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto">
-            Explore the powerful features that make PromptStack the ultimate platform for prompt engineering and AI development.
+            Explore the powerful features that make Promptrix the ultimate platform for prompt engineering and AI development.
           </p>
         </div>
 
@@ -1338,11 +1338,11 @@ Response:`)
 
         {/* Call to Action */}
         <div className="text-center mt-12">
-          <Card className="max-w-2xl mx-auto bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border-promptstack-primary/20">
+          <Card className="max-w-2xl mx-auto bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border-promptrix-primary/20">
             <CardContent className="p-8">
               <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
               <p className="text-muted-foreground mb-6">
-                Join thousands of developers and teams already using PromptStack to build better AI applications.
+                Join thousands of developers and teams already using Promptrix to build better AI applications.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" onClick={handleGetStarted} className="group">

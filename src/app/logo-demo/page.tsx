@@ -19,7 +19,7 @@ export default function LogoDemoPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold">PromptStack Logo Showcase</h1>
+          <h1 className="text-3xl font-bold">Promptrix Logo Showcase</h1>
         </div>
 
         {/* Logo Variations */}
@@ -118,12 +118,12 @@ export default function LogoDemoPage() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded-lg mx-auto mb-2"></div>
+                  <div className="w-16 h-16 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary rounded-lg mx-auto mb-2"></div>
                   <p className="text-xs font-medium">Primary Gradient</p>
                   <p className="text-xs text-muted-foreground">#667eea → #764ba2</p>
                 </div>
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-promptstack-primary rounded-lg mx-auto mb-2"></div>
+                  <div className="w-16 h-16 bg-promptrix-primary rounded-lg mx-auto mb-2"></div>
                   <p className="text-xs font-medium">Primary</p>
                   <p className="text-xs text-muted-foreground">#667eea</p>
                 </div>

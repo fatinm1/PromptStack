@@ -131,7 +131,7 @@ export default function ABTestingPage() {
               Create your first A/B test to compare different prompt versions and find the best performing ones.
             </p>
             <Button 
-              className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary"
+              className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary"
               onClick={() => router.push('/dashboard/ab-testing/create')}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -150,7 +150,7 @@ export default function ABTestingPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="flex items-center">
-                      <BarChart3 className="w-4 h-4 mr-2 text-promptstack-primary" />
+                      <BarChart3 className="w-4 h-4 mr-2 text-promptrix-primary" />
                       {test.name}
                     </CardTitle>
                     <CardDescription className="mt-2">
@@ -253,7 +253,7 @@ export default function ABTestingPage() {
                       
                       {isRunning ? (
                         <div className="flex items-center justify-center py-4">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-promptstack-primary"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-promptrix-primary"></div>
                         </div>
                       ) : (
                         <div className="p-3 bg-background border rounded-md text-sm">
@@ -295,7 +295,7 @@ export default function ABTestingPage() {
                       
                       {isRunning ? (
                         <div className="flex items-center justify-center py-4">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-promptstack-primary"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-promptrix-primary"></div>
                         </div>
                       ) : (
                         <div className="p-3 bg-background border rounded-md text-sm">

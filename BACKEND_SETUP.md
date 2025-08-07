@@ -1,8 +1,8 @@
-# PromptStack Backend Setup Guide
+# Promptrix Backend Setup Guide
 
 ## 🚀 Backend Architecture
 
-PromptStack uses a modern, scalable backend architecture:
+Promptrix uses a modern, scalable backend architecture:
 
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: NextAuth.js with JWT
@@ -438,4 +438,4 @@ npm start 2>&1 | tee app.log
 
 ---
 
-The backend is now ready to power your PromptStack application! 🚀 
+The backend is now ready to power your Promptrix application! 🚀 

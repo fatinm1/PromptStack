@@ -116,7 +116,7 @@ export const useAppStore = create<AppState>()(
       })),
     }),
     {
-      name: 'promptstack-store',
+      name: 'promptrix-store',
     }
   )
 ) 

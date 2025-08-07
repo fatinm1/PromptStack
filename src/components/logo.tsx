@@ -97,9 +97,9 @@ export function Logo({ size = 'md', className = '', showText = true }: LogoProps
       {/* Text Logo */}
       {showText && (
         <div className="flex flex-col">
-          <span className="font-bold text-xl bg-gradient-to-r from-promptstack-primary to-promptstack-secondary bg-clip-text text-transparent">
-            PromptStack
-          </span>
+                  <span className="font-bold text-xl bg-gradient-to-r from-promptrix-primary to-promptrix-secondary bg-clip-text text-transparent">
+          Promptrix
+        </span>
           <span className="text-xs text-muted-foreground -mt-1">
             AI Prompt Platform
           </span>

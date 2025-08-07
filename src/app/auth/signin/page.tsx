@@ -39,7 +39,7 @@ export default function SignInPage() {
         <CardHeader>
           <CardTitle>Sign In</CardTitle>
           <CardDescription>
-            Welcome back to PromptStack
+            Welcome back to Promptrix
           </CardDescription>
         </CardHeader>
         <CardContent>

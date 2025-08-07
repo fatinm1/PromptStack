@@ -189,7 +189,7 @@ export default function DatasetsPage() {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Create your first dataset to start testing your prompts with real data. Datasets help you evaluate prompt performance across multiple test cases.
             </p>
-            <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary" onClick={handleCreateDataset}>
+            <Button className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary" onClick={handleCreateDataset}>
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Dataset
             </Button>

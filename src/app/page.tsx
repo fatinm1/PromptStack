@@ -42,7 +42,7 @@ function FloatingParticles() {
       {[...Array(20)].map((_, i) => (
         <div
           key={i}
-          className="absolute w-2 h-2 bg-gradient-to-r from-promptstack-primary/20 to-promptstack-secondary/20 rounded-full animate-pulse"
+                      className="absolute w-2 h-2 bg-gradient-to-r from-promptrix-primary/20 to-promptrix-secondary/20 rounded-full animate-pulse"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
@@ -59,8 +59,8 @@ function FloatingParticles() {
 function AnimatedGradient() {
   return (
     <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="absolute inset-0 bg-gradient-to-r from-promptstack-primary/5 via-transparent to-promptstack-secondary/5 animate-pulse" />
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-promptstack-primary/10 to-transparent animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-promptrix-primary/5 via-transparent to-promptrix-secondary/5 animate-pulse" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-promptrix-primary/10 to-transparent animate-pulse" />
     </div>
   )
 }
@@ -94,7 +94,7 @@ function StatsSection() {
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <div className="flex justify-center mb-2">
-              <stat.icon className="w-6 h-6 text-promptstack-primary" />
+              <stat.icon className="w-6 h-6 text-promptrix-primary" />
             </div>
             <div className="text-2xl font-bold gradient-text">{stat.value}</div>
             <div className="text-sm text-muted-foreground">{stat.label}</div>
@@ -130,7 +130,7 @@ function DemoPreview() {
               onClick={() => setActiveTab(index)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                 activeTab === index 
-                  ? 'bg-promptstack-primary text-white' 
+                  ? 'bg-promptrix-primary text-white' 
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -173,9 +173,9 @@ function DemoPreview() {
           
           {activeTab === 2 && (
             <div className="space-y-4">
-              <div className="h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded"></div>
-              <div className="h-8 bg-gradient-to-r from-promptstack-secondary to-promptstack-primary rounded"></div>
-              <div className="h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded"></div>
+                      <div className="h-8 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary rounded"></div>
+        <div className="h-8 bg-gradient-to-r from-promptrix-secondary to-promptrix-primary rounded"></div>
+        <div className="h-8 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary rounded"></div>
             </div>
           )}
         </div>
@@ -269,17 +269,17 @@ export default function HomePage() {
       <section className="relative container mx-auto px-4 py-20 text-center z-10 overflow-hidden">
         {/* Linear-style gradient orbs */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-promptstack-primary/20 to-promptstack-secondary/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-promptrix-primary/20 to-promptrix-secondary/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
           <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 
         <div className="max-w-6xl mx-auto relative">
           {/* Badge */}
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-8 animate-fade-in backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">The Future of Prompt Engineering</span>
-          </div>
+                  <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-8 animate-fade-in backdrop-blur-sm">
+          <Sparkles className="w-4 h-4 text-promptrix-primary" />
+          <span className="text-sm font-medium text-promptrix-primary">The Future of Prompt Engineering</span>
+        </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in leading-tight">
             <span className="linear-gradient-text">GitHub</span>
@@ -302,12 +302,12 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <Button size="lg" className="group linear-button bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90 text-white linear-shadow hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-6 py-4 text-base font-semibold" onClick={handleGetStarted}>
+            <Button size="lg" className="group linear-button bg-gradient-to-r from-promptrix-primary to-promptrix-secondary hover:from-promptrix-primary/90 hover:to-promptrix-secondary/90 text-white linear-shadow hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-6 py-4 text-base font-semibold" onClick={handleGetStarted}>
               <Rocket className="mr-2 w-5 h-5" />
               Start Building
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg" onClick={handleWatchDemo} className="group hover:bg-promptstack-primary/10 hover:border-promptstack-primary/30 transition-all duration-300 px-6 py-4 text-base font-semibold linear-backdrop linear-border-glow">
+            <Button variant="outline" size="lg" onClick={handleWatchDemo} className="group hover:bg-promptrix-primary/10 hover:border-promptrix-primary/30 transition-all duration-300 px-6 py-4 text-base font-semibold linear-backdrop linear-border-glow">
               <Play className="mr-2 w-4 h-4" />
               Demo
             </Button>
@@ -316,7 +316,7 @@ export default function HomePage() {
           {/* Linear-style floating elements */}
           <div className="relative mt-20">
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full max-w-4xl h-32 linear-bg rounded-2xl border border-promptstack-primary/10 linear-backdrop"></div>
+              <div className="w-full max-w-4xl h-32 linear-bg rounded-2xl border border-promptrix-primary/10 linear-backdrop"></div>
             </div>
             
             {/* Linear-style application screenshot */}
@@ -332,7 +332,7 @@ export default function HomePage() {
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     </div>
                     <div className="flex items-center space-x-2 md:space-x-4 text-xs md:text-sm text-muted-foreground">
-                      <span className="hidden sm:inline">PromptStack</span>
+                      <span className="hidden sm:inline">Promptrix</span>
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     </div>
                   </div>
@@ -342,10 +342,10 @@ export default function HomePage() {
                     {/* Sidebar */}
                     <div className="w-full md:w-64 bg-card/50 border-b md:border-b-0 md:border-r border-border/50 p-3 md:p-4">
                       <div className="flex items-center space-x-2 mb-4 md:mb-6">
-                        <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded-lg flex items-center justify-center">
+                        <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary rounded-lg flex items-center justify-center">
                           <Code className="w-3 h-3 md:w-5 md:h-5 text-white" />
                         </div>
-                        <span className="font-bold text-sm md:text-base">PromptStack</span>
+                        <span className="font-bold text-sm md:text-base">Promptrix</span>
                       </div>
                       
                       <nav className="space-y-1 md:space-y-2">
@@ -466,15 +466,15 @@ export default function HomePage() {
       {/* Features Section */}
       <section id="features" className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
-            <Lightbulb className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">Powerful Features</span>
-          </div>
+                  <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-6">
+          <Lightbulb className="w-4 h-4 text-promptrix-primary" />
+          <span className="text-sm font-medium text-promptrix-primary">Powerful Features</span>
+        </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Everything you need to build with LLMs
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto">
-            From prompt versioning to A/B testing, PromptStack provides the tools teams need to build reliable AI applications.
+            From prompt versioning to A/B testing, Promptrix provides the tools teams need to build reliable AI applications.
           </p>
         </div>
 
@@ -537,7 +537,7 @@ export default function HomePage() {
       <section className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
-            See PromptStack in Action
+            See Promptrix in Action
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
             Experience the power of collaborative prompt engineering with our interactive demo.
@@ -729,7 +729,7 @@ export default function HomePage() {
 
         {/* Call to Action */}
         <div className="mt-12 text-center">
-          <Button size="lg" className="group bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={handleGetStarted}>
+          <Button size="lg" className="group bg-gradient-to-r from-promptrix-primary to-promptrix-secondary hover:from-promptrix-primary/90 hover:to-promptrix-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={handleGetStarted}>
             <Play className="mr-2 w-5 h-5" />
             Try It Now
             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -740,15 +740,15 @@ export default function HomePage() {
       {/* Customer Testimonials */}
       <section className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
-            <Users className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">Customer Stories</span>
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-6">
+            <Users className="w-4 h-4 text-promptrix-primary" />
+            <span className="text-sm font-medium text-promptrix-primary">Customer Stories</span>
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             What Users Say
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of developers and teams already using PromptStack
+            Join thousands of developers and teams already using Promptrix
           </p>
         </div>
         
@@ -766,7 +766,7 @@ export default function HomePage() {
                 </div>
               </div>
               <p className="text-muted-foreground mb-4">
-                "PromptStack has revolutionized how our team manages AI prompts. The version control and A/B testing features are game-changers."
+                "Promptrix has revolutionized how our team manages AI prompts. The version control and A/B testing features are game-changers."
               </p>
               <div className="flex items-center">
                 <div className="flex text-yellow-400">
@@ -839,10 +839,10 @@ export default function HomePage() {
       {/* Pricing Section */}
       <section id="pricing" className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
-            <Star className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">Simple Pricing</span>
-          </div>
+                  <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-6">
+          <Star className="w-4 h-4 text-promptrix-primary" />
+          <span className="text-sm font-medium text-promptrix-primary">Simple Pricing</span>
+        </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Simple, transparent pricing
           </h2>
@@ -878,16 +878,16 @@ export default function HomePage() {
                   Community support
                 </li>
               </ul>
-              <Button className="w-full mt-6 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90" onClick={handleGetStarted}>
+              <Button className="w-full mt-6 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary hover:from-promptrix-primary/90 hover:to-promptrix-secondary/90" onClick={handleGetStarted}>
                 Get Started Free
               </Button>
             </CardContent>
           </Card>
 
           {/* Pro Plan */}
-          <Card className="relative group hover:scale-105 transition-transform duration-300 border-2 border-promptstack-primary bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+          <Card className="relative group hover:scale-105 transition-transform duration-300 border-2 border-promptrix-primary bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <span className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary text-white px-4 py-1 rounded-full text-xs font-medium">
+              <span className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary text-white px-4 py-1 rounded-full text-xs font-medium">
                 Most Popular
               </span>
             </div>
@@ -919,7 +919,7 @@ export default function HomePage() {
                   Priority support
                 </li>
               </ul>
-              <Button className="w-full mt-6 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90" onClick={handleGetStarted}>
+              <Button className="w-full mt-6 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary hover:from-promptrix-primary/90 hover:to-promptrix-secondary/90" onClick={handleGetStarted}>
                 Start Pro Trial
               </Button>
             </CardContent>
@@ -966,31 +966,31 @@ export default function HomePage() {
       {/* FAQ Section */}
       <section className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
-            <MessageSquare className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">Common Questions</span>
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-6">
+            <MessageSquare className="w-4 h-4 text-promptrix-primary" />
+            <span className="text-sm font-medium text-promptrix-primary">Common Questions</span>
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Frequently Asked Questions
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to know about PromptStack
+            Everything you need to know about Promptrix
           </p>
         </div>
         
         <div className="max-w-4xl mx-auto space-y-6">
           {[
             {
-              question: "How is PromptStack different from regular code repositories?",
-              answer: "PromptStack is specifically designed for prompt engineering workflows. It includes built-in A/B testing, real-time collaboration, cost tracking, and integration with multiple AI models - features that generic code repositories don't provide."
+                          question: "How is Promptrix different from regular code repositories?",
+            answer: "Promptrix is specifically designed for prompt engineering workflows. It includes built-in A/B testing, real-time collaboration, cost tracking, and integration with multiple AI models - features that generic code repositories don't provide."
             },
             {
-              question: "Which AI models does PromptStack support?",
+              question: "Which AI models does Promptrix support?",
               answer: "We support all major AI models including GPT-4, GPT-3.5-turbo, Claude-3, Claude-2, and more. You can easily switch between models and compare their performance side-by-side."
             },
             {
-              question: "Can I use PromptStack with my existing AI infrastructure?",
-              answer: "Yes! PromptStack integrates seamlessly with your existing AI infrastructure. You can connect your own API keys and continue using your preferred AI models while gaining our collaboration and testing features."
+              question: "Can I use Promptrix with my existing AI infrastructure?",
+              answer: "Yes! Promptrix integrates seamlessly with your existing AI infrastructure. You can connect your own API keys and continue using your preferred AI models while gaining our collaboration and testing features."
             },
             {
               question: "How does the A/B testing work?",
@@ -1006,7 +1006,7 @@ export default function HomePage() {
             }
           ].map((faq, index) => (
             <Card key={index} className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-br from-promptstack-primary to-promptstack-secondary opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-promptrix-primary to-promptrix-secondary opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
               <CardContent className="p-6 relative">
                 <h3 className="font-semibold text-lg mb-3">{faq.question}</h3>
                 <p className="text-muted-foreground">
@@ -1020,25 +1020,25 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="relative container mx-auto px-4 py-20 z-10">
-        <Card className="max-w-5xl mx-auto bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border-promptstack-primary/20 backdrop-blur-sm">
+        <Card className="max-w-5xl mx-auto bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border-promptrix-primary/20 backdrop-blur-sm">
           <CardContent className="text-center py-16">
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/20 to-promptstack-secondary/20 border border-promptstack-primary/30 rounded-full px-4 py-2 mb-6">
-              <Rocket className="w-4 h-4 text-promptstack-primary" />
-              <span className="text-sm font-medium text-promptstack-primary">Ready to Launch?</span>
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/20 to-promptrix-secondary/20 border border-promptrix-primary/30 rounded-full px-4 py-2 mb-6">
+              <Rocket className="w-4 h-4 text-promptrix-primary" />
+              <span className="text-sm font-medium text-promptrix-primary">Ready to Launch?</span>
             </div>
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
               Ready to build the future of AI?
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Join thousands of developers and teams already using PromptStack to build better AI applications.
+              Join thousands of developers and teams already using Promptrix to build better AI applications.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="group bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={handleGetStarted}>
+              <Button size="lg" className="group bg-gradient-to-r from-promptrix-primary to-promptrix-secondary hover:from-promptrix-primary/90 hover:to-promptrix-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" onClick={handleGetStarted}>
                 <Rocket className="mr-2 w-5 h-5" />
                 Get Started Free
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="outline" size="lg" onClick={() => alert('Documentation would open here!')} className="group hover:bg-promptstack-primary/10 hover:border-promptstack-primary/30 transition-all duration-300">
+              <Button variant="outline" size="lg" onClick={() => alert('Documentation would open here!')} className="group hover:bg-promptrix-primary/10 hover:border-promptrix-primary/30 transition-all duration-300">
                 <Globe className="mr-2 w-4 h-4" />
                 View Documentation
               </Button>
@@ -1050,21 +1050,21 @@ export default function HomePage() {
       {/* Newsletter Signup */}
       <section className="relative container mx-auto px-4 py-20 z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptstack-primary/10 to-promptstack-secondary/10 border border-promptstack-primary/20 rounded-full px-4 py-2 mb-6">
-            <MessageSquare className="w-4 h-4 text-promptstack-primary" />
-            <span className="text-sm font-medium text-promptstack-primary">Newsletter</span>
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-promptrix-primary/10 to-promptrix-secondary/10 border border-promptrix-primary/20 rounded-full px-4 py-2 mb-6">
+            <MessageSquare className="w-4 h-4 text-promptrix-primary" />
+            <span className="text-sm font-medium text-promptrix-primary">Newsletter</span>
           </div>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 gradient-text">
             Stay Updated
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get the latest updates on prompt engineering, AI development, and new PromptStack features
+            Get the latest updates on prompt engineering, AI development, and new Promptrix features
           </p>
         </div>
         
         <div className="max-w-md mx-auto">
           <Card className="card-hover group relative overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-promptstack-primary to-promptstack-secondary opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-br from-promptrix-primary to-promptrix-secondary opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
             <CardContent className="p-6 relative">
               <div className="flex flex-col sm:flex-row gap-4">
                 <Input 
@@ -1072,7 +1072,7 @@ export default function HomePage() {
                   placeholder="Enter your email" 
                   className="flex-1"
                 />
-                <Button className="bg-gradient-to-r from-promptstack-primary to-promptstack-secondary hover:from-promptstack-primary/90 hover:to-promptstack-secondary/90">
+                <Button className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary hover:from-promptrix-primary/90 hover:to-promptrix-secondary/90">
                   Subscribe
                 </Button>
               </div>
@@ -1089,10 +1089,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-gradient-to-r from-promptstack-primary to-promptstack-secondary rounded flex items-center justify-center">
+              <div className="w-6 h-6 bg-gradient-to-r from-promptrix-primary to-promptrix-secondary rounded flex items-center justify-center">
                 <Code className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold gradient-text">PromptStack</span>
+              <span className="font-bold gradient-text">Promptrix</span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-muted-foreground">
               <a href="#" className="hover:text-foreground transition-colors">Privacy</a>

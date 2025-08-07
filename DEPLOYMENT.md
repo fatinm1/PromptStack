@@ -1,6 +1,6 @@
 # 🚀 Railway Deployment Guide
 
-This guide will help you deploy PromptStack to Railway with frontend, backend, and database all in one place.
+This guide will help you deploy Promptrix to Railway with frontend, backend, and database all in one place.
 
 ## 📋 Prerequisites
 
@@ -15,7 +15,7 @@ This guide will help you deploy PromptStack to Railway with frontend, backend, a
 1. Go to [railway.app](https://railway.app)
 2. Click "Start a New Project"
 3. Choose "Deploy from GitHub repo"
-4. Select your PromptStack repository
+4. Select your Promptrix repository
 5. Click "Deploy Now"
 
 ### **Step 2: Add PostgreSQL Database**
@@ -74,7 +74,7 @@ npx prisma db seed
 ### **Step 6: Verify Deployment**
 
 1. Click on your app's URL in Railway
-2. You should see the PromptStack landing page
+2. You should see the Promptrix landing page
 3. Test the signup/login functionality
 4. Test creating prompts and A/B tests
 
@@ -181,7 +181,7 @@ railway up
 
 ## 🎉 Success!
 
-Once deployed, your PromptStack app will be available at:
+Once deployed, your Promptrix app will be available at:
 `https://your-app-name.railway.app`
 
 ### **Next Steps:**
