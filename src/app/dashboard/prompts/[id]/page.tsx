@@ -296,7 +296,7 @@ export default function PromptDetailPage({ params }: { params: { id: string } })
             <CardHeader>
               <CardTitle>Prompt Content</CardTitle>
               <CardDescription>
-                Edit your prompt content. Use {{variable_name}} for dynamic content.
+                Edit your prompt content. Use {'{{variable_name}}'} for dynamic content.
               </CardDescription>
             </CardHeader>
             <CardContent>
