@@ -454,7 +454,7 @@ export default function PromptTestPage({ params }: { params: { id: string } }) {
               <div className="space-y-2">
                 <Label>No Variables Found</Label>
                 <p className="text-sm text-muted-foreground">
-                  Your prompt doesn't contain any variables ({{variable}}). You can still test it.
+                  Your prompt doesn't contain any variables ({'{variable}'}). You can still test it.
                 </p>
                 <Textarea
                   value={testInput}
