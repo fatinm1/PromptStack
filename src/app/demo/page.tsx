@@ -46,6 +46,42 @@ export default function DemoPage() {
   const [testInput, setTestInput] = useState('')
   const [testResult, setTestResult] = useState('')
   const [isTesting, setIsTesting] = useState(false)
+  const [selectedModel, setSelectedModel] = useState('gpt-4')
+  const [temperature, setTemperature] = useState(0.7)
+  const [maxTokens, setMaxTokens] = useState(1000)
+  const [promptContent, setPromptContent] = useState(`You are a helpful customer service assistant for TechCorp. Your role is to help customers with technical issues and provide excellent support.
+
+Customer query: {customer_query}
+
+Please provide a helpful, professional response that:
+- Addresses the customer's concern directly
+- Offers a clear solution or next steps
+- Maintains a friendly, professional tone
+- Includes follow-up information if needed
+
+Response:`)
+  const [abTestResults, setAbTestResults] = useState([
+    { version: 'A', wins: 67, losses: 33, avgRating: 4.2, cost: 0.004 },
+    { version: 'B', wins: 83, losses: 17, avgRating: 4.8, cost: 0.003 }
+  ])
+  const [analyticsData, setAnalyticsData] = useState({
+    totalTests: 1247,
+    successRate: 99.2,
+    avgLatency: 1.8,
+    totalCost: 1247,
+    avgRating: 4.8
+  })
+  const [teamMembers, setTeamMembers] = useState([
+    { name: 'Sarah Chen', role: 'AI Engineer', status: 'online', avatar: 'S', color: 'from-blue-500 to-purple-500' },
+    { name: 'Mike Rodriguez', role: 'Lead Developer', status: 'online', avatar: 'M', color: 'from-green-500 to-blue-500' },
+    { name: 'Alex Thompson', role: 'CTO', status: 'offline', avatar: 'A', color: 'from-purple-500 to-pink-500' },
+    { name: 'Emma Wilson', role: 'Product Manager', status: 'online', avatar: 'E', color: 'from-orange-500 to-red-500' }
+  ])
+  const [versionHistory, setVersionHistory] = useState([
+    { version: 'v1.2', author: 'Sarah Chen', date: '2 hours ago', changes: 'Improved tone and added follow-up information', status: 'merged' },
+    { version: 'v1.1', author: 'Mike Rodriguez', date: '1 day ago', changes: 'Added error handling and better formatting', status: 'merged' },
+    { version: 'v1.0', author: 'Alex Thompson', date: '3 days ago', changes: 'Initial customer service prompt', status: 'merged' }
+  ])
 
   const handleBack = () => {
     router.push('/')
@@ -146,10 +182,10 @@ export default function DemoPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Code className="w-5 h-5 mr-2" />
-                      Prompt Editor
+                      Advanced Prompt Editor
                     </CardTitle>
                     <CardDescription>
-                      Create and test prompts with real-time AI integration
+                      Create, test, and optimize prompts with real-time AI integration
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -157,41 +193,113 @@ export default function DemoPage() {
                       <label className="text-sm font-medium mb-2 block">Prompt Name</label>
                       <Input value="Customer Service Assistant" readOnly />
                     </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Model</label>
-                      <Input value="GPT-4" readOnly />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">AI Model</label>
+                        <select 
+                          value={selectedModel} 
+                          onChange={(e) => setSelectedModel(e.target.value)}
+                          className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                        >
+                          <optgroup label="OpenAI Models">
+                            <option value="gpt-4o">GPT-4o (Latest & Most Capable)</option>
+                            <option value="gpt-4o-mini">GPT-4o Mini (Fast & Affordable)</option>
+                            <option value="gpt-4-turbo">GPT-4 Turbo (Balanced)</option>
+                            <option value="gpt-4">GPT-4 (High Quality)</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fast & Cheap)</option>
+                          </optgroup>
+                          <optgroup label="Anthropic Models">
+                            <option value="claude-3-5-sonnet">Claude 3.5 Sonnet (Latest)</option>
+                            <option value="claude-3-5-haiku">Claude 3.5 Haiku (Fast)</option>
+                            <option value="claude-3-opus">Claude 3 Opus (Most Powerful)</option>
+                            <option value="claude-3-sonnet">Claude 3 Sonnet (Balanced)</option>
+                            <option value="claude-3-haiku">Claude 3 Haiku (Lightweight)</option>
+                          </optgroup>
+                          <optgroup label="Google Models">
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast)</option>
+                            <option value="gemini-pro">Gemini Pro (Standard)</option>
+                          </optgroup>
+                          <optgroup label="Meta Models">
+                            <option value="llama-3.1-405b">Llama 3.1 405B (Largest)</option>
+                            <option value="llama-3.1-70b">Llama 3.1 70B (Balanced)</option>
+                            <option value="llama-3.1-8b">Llama 3.1 8B (Fast)</option>
+                          </optgroup>
+                          <optgroup label="Mistral Models">
+                            <option value="mistral-large">Mistral Large (High Quality)</option>
+                            <option value="mistral-medium">Mistral Medium (Balanced)</option>
+                            <option value="mistral-small">Mistral Small (Fast)</option>
+                          </optgroup>
+                          <optgroup label="Cohere Models">
+                            <option value="command-r-plus">Command R+ (Advanced)</option>
+                            <option value="command-r">Command R (Standard)</option>
+                            <option value="command-light">Command Light (Fast)</option>
+                          </optgroup>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Temperature</label>
+                        <div className="space-y-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max="2"
+                            step="0.1"
+                            value={temperature}
+                            onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Focused ({temperature})</span>
+                            <span>Creative</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Temperature</label>
-                      <Input value="0.7" readOnly />
+                      <label className="text-sm font-medium mb-2 block">Max Tokens</label>
+                      <Input 
+                        type="number"
+                        value={maxTokens}
+                        onChange={(e) => setMaxTokens(parseInt(e.target.value))}
+                        min="1"
+                        max="4000"
+                      />
                     </div>
+
                     <div>
                       <label className="text-sm font-medium mb-2 block">Prompt Content</label>
                       <Textarea 
-                        value={`You are a helpful customer service assistant for TechCorp. Your role is to help customers with technical issues and provide excellent support.
-
-Customer query: {customer_query}
-
-Please provide a helpful, professional response that:
-- Addresses the customer's concern directly
-- Offers a clear solution or next steps
-- Maintains a friendly, professional tone
-- Includes follow-up information if needed
-
-Response:`}
-                        rows={8}
-                        readOnly
+                        value={promptContent}
+                        onChange={(e) => setPromptContent(e.target.value)}
+                        rows={12}
                         className="font-mono text-sm"
+                        placeholder="Enter your prompt template here..."
                       />
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        Use {'{variable}'} syntax for dynamic inputs. Available variables: customer_query, user_name, product_name
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        Estimated cost: $0.004 per test • Tokens: ~247
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy Template
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Test Your Prompt</CardTitle>
+                    <CardTitle>Interactive Testing</CardTitle>
                     <CardDescription>
-                      Try the prompt with different inputs
+                      Test your prompt with real AI responses
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -202,7 +310,42 @@ Response:`}
                         value={testInput}
                         onChange={(e) => setTestInput(e.target.value)}
                       />
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        Try: "My order hasn't arrived yet" or "I want to cancel my subscription"
+                      </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setTestInput("My order hasn't arrived yet")}
+                      >
+                        Order Issue
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setTestInput("I want to cancel my subscription")}
+                      >
+                        Cancellation
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setTestInput("Your product doesn't work as advertised")}
+                      >
+                        Product Complaint
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setTestInput("Can you help me with a refund?")}
+                      >
+                        Refund Request
+                      </Button>
+                    </div>
+
                     <Button 
                       onClick={runTest} 
                       disabled={!testInput.trim() || isTesting}
@@ -211,7 +354,7 @@ Response:`}
                       {isTesting ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Testing...
+                          Testing with {selectedModel}...
                         </>
                       ) : (
                         <>
@@ -220,10 +363,42 @@ Response:`}
                         </>
                       )}
                     </Button>
+
                     {testResult && (
-                      <div className="mt-4 p-4 bg-muted rounded-lg">
-                        <h4 className="font-medium mb-2">AI Response:</h4>
-                        <p className="text-sm text-muted-foreground">{testResult}</p>
+                      <div className="mt-4 space-y-4">
+                        <div className="p-4 bg-muted rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-medium">AI Response:</h4>
+                            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                              <span>Model: {selectedModel}</span>
+                              <span>•</span>
+                              <span>Temp: {temperature}</span>
+                              <span>•</span>
+                              <span>1.8s</span>
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">{testResult}</p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span>Cost: $0.004</span>
+                            <span>Tokens: 247</span>
+                            <span>Rating: 4.8/5 ⭐⭐⭐⭐⭐</span>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                            <div className="text-lg font-bold text-green-600">4.8</div>
+                            <div className="text-xs text-muted-foreground">Quality</div>
+                          </div>
+                          <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <div className="text-lg font-bold text-blue-600">1.8s</div>
+                            <div className="text-xs text-muted-foreground">Latency</div>
+                          </div>
+                          <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded">
+                            <div className="text-lg font-bold text-purple-600">$0.004</div>
+                            <div className="text-xs text-muted-foreground">Cost</div>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -309,38 +484,81 @@ Response:`}
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <GitPullRequest className="w-5 h-5 mr-2" />
-                      A/B Testing Setup
+                      A/B Testing Configuration
                     </CardTitle>
                     <CardDescription>
-                      Compare different prompt versions
+                      Set up comprehensive prompt comparison tests
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
                       <label className="text-sm font-medium mb-2 block">Test Name</label>
-                      <Input value="Customer Service A/B Test" readOnly />
+                      <Input value="Customer Service Tone Optimization" readOnly />
                     </div>
+                    
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Version A</label>
-                        <Input value="Formal Tone" readOnly />
+                        <label className="text-sm font-medium mb-2 block">Version A (Control)</label>
+                        <div className="p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-medium mb-1">Formal Professional Tone</div>
+                          <div className="text-xs text-muted-foreground">Traditional customer service approach</div>
+                        </div>
                       </div>
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Version B</label>
-                        <Input value="Friendly Tone" readOnly />
+                        <label className="text-sm font-medium mb-2 block">Version B (Variant)</label>
+                        <div className="p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-medium mb-1">Friendly Conversational Tone</div>
+                          <div className="text-xs text-muted-foreground">Modern, approachable style</div>
+                        </div>
                       </div>
                     </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Test Parameters</label>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <div className="font-medium">Sample Size</div>
+                          <div className="text-muted-foreground">1,000 tests</div>
+                        </div>
+                        <div>
+                          <div className="font-medium">Confidence Level</div>
+                          <div className="text-muted-foreground">95%</div>
+                        </div>
+                        <div>
+                          <div className="font-medium">Duration</div>
+                          <div className="text-muted-foreground">7 days</div>
+                        </div>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="text-sm font-medium mb-2 block">Test Inputs</label>
                       <Textarea 
                         value={`"My order hasn't arrived yet"
 "I want to cancel my subscription"
 "Your product doesn't work as advertised"
-"Can you help me with a refund?"`}
-                        rows={4}
+"Can you help me with a refund?"
+"I'm having trouble with your website"
+"The item I received is damaged"
+"I need help with my account"
+"Your customer service is terrible"`}
+                        rows={6}
                         readOnly
                         className="font-mono text-sm"
                       />
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        8 different customer scenarios for comprehensive testing
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        Estimated cost: $32.00 • Duration: 7 days
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Play className="w-4 h-4 mr-2" />
+                        Run Test
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -349,39 +567,126 @@ Response:`}
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Test Results</CardTitle>
+                    <CardTitle>Comprehensive Test Results</CardTitle>
                     <CardDescription>
-                      Real-time comparison results
+                      Detailed statistical analysis and insights
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">Version A (Formal)</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-24 h-2 bg-gray-200 rounded-full">
-                            <div className="w-16 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="space-y-6">
+                      {/* Performance Comparison */}
+                      <div>
+                        <h4 className="font-medium mb-3">Performance Comparison</h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                              <span className="font-medium">Version A (Formal)</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-24 h-2 bg-gray-200 rounded-full">
+                                <div className="w-16 h-2 bg-blue-500 rounded-full"></div>
+                              </div>
+                              <span className="text-sm font-medium">67%</span>
+                            </div>
                           </div>
-                          <span className="text-sm font-medium">67%</span>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <span className="font-medium">Version B (Friendly)</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-24 h-2 bg-gray-200 rounded-full">
+                                <div className="w-20 h-2 bg-green-500 rounded-full"></div>
+                              </div>
+                              <span className="text-sm font-medium">83%</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">Version B (Friendly)</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-24 h-2 bg-gray-200 rounded-full">
-                            <div className="w-20 h-2 bg-green-500 rounded-full"></div>
+
+                      {/* Detailed Metrics */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <h5 className="font-medium text-sm">Version A Metrics</h5>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Win Rate:</span>
+                              <span className="font-medium">67%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Avg Rating:</span>
+                              <span className="font-medium">4.2/5</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Avg Cost:</span>
+                              <span className="font-medium">$0.004</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Response Time:</span>
+                              <span className="font-medium">2.1s</span>
+                            </div>
                           </div>
-                          <span className="text-sm font-medium">83%</span>
+                        </div>
+                        <div className="space-y-3">
+                          <h5 className="font-medium text-sm">Version B Metrics</h5>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span>Win Rate:</span>
+                              <span className="font-medium text-green-600">83%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Avg Rating:</span>
+                              <span className="font-medium text-green-600">4.8/5</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Avg Cost:</span>
+                              <span className="font-medium text-green-600">$0.003</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Response Time:</span>
+                              <span className="font-medium text-green-600">1.8s</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <div className="flex items-center">
+
+                      {/* Winner Analysis */}
+                      <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <div className="flex items-center mb-2">
                           <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                          <span className="font-medium text-green-600">Winner: Version B</span>
+                          <span className="font-medium text-green-600">Winner: Version B (Friendly)</span>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Version B shows 16% better performance across all test cases
-                        </p>
+                        <div className="space-y-2 text-sm">
+                          <p className="text-muted-foreground">
+                            Version B shows statistically significant improvements across all metrics:
+                          </p>
+                          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                            <li>16% higher win rate (83% vs 67%)</li>
+                            <li>14% better average rating (4.8 vs 4.2)</li>
+                            <li>25% lower cost per response ($0.003 vs $0.004)</li>
+                            <li>14% faster response time (1.8s vs 2.1s)</li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Statistical Significance */}
+                      <div>
+                        <h5 className="font-medium mb-2">Statistical Analysis</h5>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <div className="text-lg font-bold text-blue-600">95%</div>
+                            <div className="text-xs text-muted-foreground">Confidence</div>
+                          </div>
+                          <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                            <div className="text-lg font-bold text-green-600">1,000</div>
+                            <div className="text-xs text-muted-foreground">Sample Size</div>
+                          </div>
+                          <div className="text-center p-2 bg-purple-50 dark:bg-purple-900/20 rounded">
+                            <div className="text-lg font-bold text-purple-600">7 days</div>
+                            <div className="text-xs text-muted-foreground">Duration</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -421,13 +726,15 @@ Response:`}
 
           {activeTab === 'analytics' && (
             <div className="space-y-6">
+              {/* Key Metrics Overview */}
               <div className="grid md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Total Tests</p>
-                        <p className="text-2xl font-bold">12,847</p>
+                        <p className="text-2xl font-bold">{analyticsData.totalTests.toLocaleString()}</p>
+                        <p className="text-xs text-green-600">+12% from last month</p>
                       </div>
                       <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
                         <BarChart3 className="w-4 h-4 text-blue-600" />
@@ -440,7 +747,8 @@ Response:`}
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
-                        <p className="text-2xl font-bold text-green-600">99.2%</p>
+                        <p className="text-2xl font-bold text-green-600">{analyticsData.successRate}%</p>
+                        <p className="text-xs text-green-600">+0.3% from last week</p>
                       </div>
                       <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
                         <CheckCircle className="w-4 h-4 text-green-600" />
@@ -453,7 +761,8 @@ Response:`}
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Total Cost</p>
-                        <p className="text-2xl font-bold text-purple-600">$1,247</p>
+                        <p className="text-2xl font-bold text-purple-600">${analyticsData.totalCost.toLocaleString()}</p>
+                        <p className="text-xs text-green-600">-8% from last month</p>
                       </div>
                       <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
                         <TrendingUp className="w-4 h-4 text-purple-600" />
@@ -466,7 +775,8 @@ Response:`}
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Avg Rating</p>
-                        <p className="text-2xl font-bold text-orange-600">4.8/5</p>
+                        <p className="text-2xl font-bold text-orange-600">{analyticsData.avgRating}/5</p>
+                        <p className="text-xs text-green-600">+0.2 from last week</p>
                       </div>
                       <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
                         <Star className="w-4 h-4 text-orange-600" />
@@ -479,29 +789,80 @@ Response:`}
               <div className="grid lg:grid-cols-2 gap-8">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Cost Analysis</CardTitle>
+                    <CardTitle>Detailed Cost Analysis</CardTitle>
                     <CardDescription>
-                      Monthly spending breakdown
+                      Monthly spending breakdown by model and project
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span>GPT-4 Usage</span>
-                        <span className="font-medium">$847</span>
+                      <div>
+                        <h5 className="font-medium mb-3">By AI Model</h5>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                              <span>GPT-4o</span>
+                            </div>
+                            <span className="font-medium">$423 (34%)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <span>Claude 3.5 Sonnet</span>
+                            </div>
+                            <span className="font-medium">$312 (25%)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                              <span>Gemini 1.5 Pro</span>
+                            </div>
+                            <span className="font-medium">$249 (20%)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                              <span>Mistral Large</span>
+                            </div>
+                            <span className="font-medium">$187 (15%)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                              <span>Others</span>
+                            </div>
+                            <span className="font-medium">$76 (6%)</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>GPT-3.5 Usage</span>
-                        <span className="font-medium">$234</span>
+                      
+                      <div>
+                        <h5 className="font-medium mb-3">By Project</h5>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span>Customer Service</span>
+                            <span className="font-medium">$623 (50%)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Email Marketing</span>
+                            <span className="font-medium">$374 (30%)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Content Generation</span>
+                            <span className="font-medium">$250 (20%)</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>Claude Usage</span>
-                        <span className="font-medium">$166</span>
-                      </div>
-                      <div className="border-t pt-2">
+
+                      <div className="border-t pt-4">
                         <div className="flex items-center justify-between font-bold">
-                          <span>Total</span>
-                          <span>$1,247</span>
+                          <span>Total Monthly Cost</span>
+                          <span>${analyticsData.totalCost.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                          <span>Avg cost per test</span>
+                          <span>${(analyticsData.totalCost / analyticsData.totalTests).toFixed(3)}</span>
                         </div>
                       </div>
                     </div>
@@ -512,36 +873,77 @@ Response:`}
                   <CardHeader>
                     <CardTitle>Performance Trends</CardTitle>
                     <CardDescription>
-                      Success rate over time
+                      Key metrics over the last 30 days
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span>This Week</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 h-2 bg-gray-200 rounded-full">
-                            <div className="w-16 h-2 bg-green-500 rounded-full"></div>
+                    <div className="space-y-6">
+                      <div>
+                        <h5 className="font-medium mb-3">Success Rate Trend</h5>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span>This Week</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-20 h-2 bg-gray-200 rounded-full">
+                                <div className="w-16 h-2 bg-green-500 rounded-full"></div>
+                              </div>
+                              <span className="text-sm font-medium">99.2%</span>
+                            </div>
                           </div>
-                          <span className="text-sm font-medium">99.2%</span>
+                          <div className="flex items-center justify-between">
+                            <span>Last Week</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-20 h-2 bg-gray-200 rounded-full">
+                                <div className="w-14 h-2 bg-green-500 rounded-full"></div>
+                              </div>
+                              <span className="text-sm font-medium">98.7%</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Last Month</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-20 h-2 bg-gray-200 rounded-full">
+                                <div className="w-12 h-2 bg-green-500 rounded-full"></div>
+                              </div>
+                              <span className="text-sm font-medium">97.8%</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>Last Week</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 h-2 bg-gray-200 rounded-full">
-                            <div className="w-14 h-2 bg-green-500 rounded-full"></div>
+
+                      <div>
+                        <h5 className="font-medium mb-3">Response Time Trend</h5>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span>This Week</span>
+                            <span className="text-sm font-medium text-blue-600">1.8s</span>
                           </div>
-                          <span className="text-sm font-medium">98.7%</span>
+                          <div className="flex items-center justify-between">
+                            <span>Last Week</span>
+                            <span className="text-sm font-medium">2.1s</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Last Month</span>
+                            <span className="text-sm font-medium">2.4s</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span>Last Month</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 h-2 bg-gray-200 rounded-full">
-                            <div className="w-12 h-2 bg-green-500 rounded-full"></div>
+
+                      <div>
+                        <h5 className="font-medium mb-3">Cost Efficiency</h5>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span>This Week</span>
+                            <span className="text-sm font-medium text-green-600">$0.003/test</span>
                           </div>
-                          <span className="text-sm font-medium">97.8%</span>
+                          <div className="flex items-center justify-between">
+                            <span>Last Week</span>
+                            <span className="text-sm font-medium">$0.004/test</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Last Month</span>
+                            <span className="text-sm font-medium">$0.005/test</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -549,6 +951,96 @@ Response:`}
                 </Card>
               </div>
             </div>
+          )}
+
+          {/* Model Comparison Section */}
+          {activeTab === 'analytics' && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Model Comparison Guide</CardTitle>
+                <CardDescription>
+                  Compare different AI models for your use case
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h5 className="font-medium mb-3">For Speed & Cost</h5>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>GPT-4o Mini</span>
+                          <span className="text-green-600">$0.00015/1K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Claude 3.5 Haiku</span>
+                          <span className="text-green-600">$0.00025/1K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Gemini 1.5 Flash</span>
+                          <span className="text-green-600">$0.000075/1K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Llama 3.1 8B</span>
+                          <span className="text-green-600">$0.0002/1K</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="font-medium mb-3">For Quality & Capability</h5>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>GPT-4o</span>
+                          <span className="text-blue-600">$0.005/1K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Claude 3.5 Sonnet</span>
+                          <span className="text-blue-600">$0.003/1K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Gemini 1.5 Pro</span>
+                          <span className="text-blue-600">$0.00375/1K</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Mistral Large</span>
+                          <span className="text-blue-600">$0.007/1K</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <h5 className="font-medium mb-3">Recommended Use Cases</h5>
+                    <div className="grid md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <div className="font-medium text-green-600">Customer Service</div>
+                        <div className="text-muted-foreground">GPT-4o Mini, Claude 3.5 Haiku</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-blue-600">Content Creation</div>
+                        <div className="text-muted-foreground">GPT-4o, Claude 3.5 Sonnet</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-purple-600">Code Generation</div>
+                        <div className="text-muted-foreground">GPT-4o, Gemini 1.5 Pro</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-orange-600">Data Analysis</div>
+                        <div className="text-muted-foreground">Claude 3.5 Sonnet, Mistral Large</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-red-600">Creative Writing</div>
+                        <div className="text-muted-foreground">GPT-4o, Claude 3.5 Sonnet</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-indigo-600">A/B Testing</div>
+                        <div className="text-muted-foreground">GPT-4o Mini, Claude 3.5 Haiku</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {activeTab === 'team' && (
