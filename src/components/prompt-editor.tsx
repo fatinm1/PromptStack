@@ -178,7 +178,7 @@ export function PromptEditor({
                 <div className="space-y-4">
                   {variablesInContent.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      No variables found. Use {{variable_name}} in your prompt to add variables.
+                      No variables found. Use {'{{variable_name}}'} in your prompt to add variables.
                     </p>
                   ) : (
                     variablesInContent.map((variable, index) => (
