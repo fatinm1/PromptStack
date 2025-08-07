@@ -89,7 +89,7 @@ export async function POST(
           provider: data.provider || 'openai',
           model: data.model || abTest.promptA.model,
           temperature: data.temperature || abTest.promptA.temperature,
-          maxTokens: data.maxTokens || abTest.promptA.maxTokens,
+          maxTokens: data.maxTokens || abTest.promptA.maxTokens || undefined,
           apiKey: data.apiKey || process.env.OPENAI_API_KEY || ''
         }
       )
@@ -102,7 +102,7 @@ export async function POST(
           provider: data.provider || 'openai',
           model: data.model || abTest.promptB.model,
           temperature: data.temperature || abTest.promptB.temperature,
-          maxTokens: data.maxTokens || abTest.promptB.maxTokens,
+          maxTokens: data.maxTokens || abTest.promptB.maxTokens || undefined,
           apiKey: data.apiKey || process.env.OPENAI_API_KEY || ''
         }
       )

@@ -294,4 +294,44 @@ export class LLMService {
 }
 
 // Export a singleton instance
-export const llmService = new LLMService() 
+export const llmService = new LLMService()
+
+// Convenience function for running prompts
+export async function runPrompt({
+  content,
+  variables,
+  model,
+  temperature
+}: {
+  content: string
+  variables: Record<string, any>
+  model: string
+  temperature: number
+}): Promise<LLMResponse> {
+  // Replace variables in content
+  let processedContent = content
+  for (const [key, value] of Object.entries(variables)) {
+    const placeholder = `{{${key}}}`
+    processedContent = processedContent.replace(new RegExp(placeholder, 'g'), String(value))
+  }
+
+  // Determine provider from model
+  let provider: 'openai' | 'anthropic' = 'openai'
+  if (model.startsWith('claude-')) {
+    provider = 'anthropic'
+  }
+
+  // Get API key based on provider
+  const apiKey = provider === 'openai' 
+    ? process.env.OPENAI_API_KEY || ''
+    : process.env.ANTHROPIC_API_KEY || ''
+
+  const config: LLMConfig = {
+    provider,
+    model,
+    temperature,
+    apiKey
+  }
+
+  return await llmService.generateResponse(processedContent, config)
+} 
