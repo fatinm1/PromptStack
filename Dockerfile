@@ -6,7 +6,6 @@ RUN apk add --no-cache \
     libc6-compat \
     openssl \
     openssl-dev \
-    libssl1.1 \
     ca-certificates
 
 # Install dependencies only when needed
