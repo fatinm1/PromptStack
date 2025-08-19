@@ -1,201 +1,233 @@
 # 🚀 Railway Deployment Guide
 
-This guide will help you deploy Promptrix to Railway with frontend, backend, and database all in one place.
+This guide will walk you through deploying Promptrix to Railway with a PostgreSQL database.
 
 ## 📋 Prerequisites
 
-1. **Railway Account**: Sign up at [railway.app](https://railway.app)
-2. **GitHub Repository**: Your code should be pushed to GitHub
-3. **API Keys**: Get your AI provider API keys ready
+- [Railway account](https://railway.app)
+- [GitHub repository](https://github.com) with your code
+- API keys for LLM services (OpenAI, Anthropic, etc.)
 
-## 🎯 Step-by-Step Deployment
+## 🗄️ Step 1: Deploy PostgreSQL Database
 
-### **Step 1: Connect to Railway**
+### 1.1 Create Railway Project
+1. Go to [railway.app](https://railway.app) and sign in
+2. Click "New Project"
+3. Choose "Deploy from GitHub repo" or "Start from scratch"
 
-1. Go to [railway.app](https://railway.app)
-2. Click "Start a New Project"
-3. Choose "Deploy from GitHub repo"
-4. Select your Promptrix repository
-5. Click "Deploy Now"
+### 1.2 Add PostgreSQL Service
+1. Click "New Service"
+2. Select "Database" → "PostgreSQL"
+3. Wait for Railway to provision the database
 
-### **Step 2: Add PostgreSQL Database**
+### 1.3 Get Database Connection String
+1. Click on your PostgreSQL service
+2. Go to "Connect" tab
+3. Copy the connection string (format: `postgresql://postgres:password@containers-us-west-XX.railway.app:XXXX/railway`)
 
-1. In your Railway project dashboard
-2. Click "New" → "Database" → "PostgreSQL"
-3. Railway will automatically create a PostgreSQL database
-4. Copy the `DATABASE_URL` from the database variables
+## 🚀 Step 2: Deploy Your Application
 
-### **Step 3: Configure Environment Variables**
+### 2.1 Connect GitHub Repository
+1. In your Railway project, click "New Service"
+2. Choose "GitHub Repo"
+3. Select your Promptrix repository
+4. Railway will automatically detect it's a Next.js app
 
-1. Go to your app's "Variables" tab
-2. Add the following environment variables:
+### 2.2 Configure Environment Variables
+In your app service, go to "Variables" tab and add:
 
 ```env
-# Database (Railway will provide this)
-DATABASE_URL="postgresql://username:password@host:port/database"
+# Database (Railway PostgreSQL)
+DATABASE_URL="postgresql://postgres:password@containers-us-west-XX.railway.app:XXXX/railway"
 
 # Authentication
 NEXTAUTH_URL="https://your-app-name.railway.app"
-NEXTAUTH_SECRET="generate-a-secure-random-string"
+NEXTAUTH_SECRET="your-production-secret-key-here"
 
-# AI Provider API Keys (Add your keys)
-OPENAI_API_KEY="sk-your-openai-key"
-ANTHROPIC_API_KEY="sk-ant-your-anthropic-key"
+# LLM APIs
+OPENAI_API_KEY="your-openai-api-key"
+ANTHROPIC_API_KEY="your-anthropic-api-key"
 GOOGLE_API_KEY="your-google-api-key"
 MISTRAL_API_KEY="your-mistral-api-key"
 COHERE_API_KEY="your-cohere-api-key"
+
+# Optional: Seed database
+SEED_DATABASE="true"
 ```
 
-### **Step 4: Generate NEXTAUTH_SECRET**
+### 2.3 Deploy
+1. Railway will automatically build and deploy your app
+2. The build process will:
+   - Install dependencies
+   - Generate Prisma client
+   - Build Next.js app
+   - Run database migrations
+   - Start the application
 
-Run this command to generate a secure secret:
+## 🔧 Step 3: Database Setup
+
+### 3.1 Initial Migration
+Your app will automatically run migrations on startup. If you need to run them manually:
+
 ```bash
-openssl rand -base64 32
-```
+# Connect to Railway shell
+railway shell
 
-### **Step 5: Deploy and Setup Database**
+# Run migrations
+npx prisma migrate deploy
 
-1. Railway will automatically deploy your app
-2. Once deployed, go to the "Deployments" tab
-3. Click on your latest deployment
-4. Open the terminal and run:
-
-```bash
-# Generate Prisma client
-npx prisma generate
-
-# Push database schema
-npx prisma db push
-
-# Seed the database
+# Seed database (optional)
 npx prisma db seed
 ```
 
-### **Step 6: Verify Deployment**
+### 3.2 Verify Database
+1. Go to your PostgreSQL service in Railway
+2. Click "Query" tab
+3. Run: `SELECT * FROM information_schema.tables;`
+4. You should see your tables: `users`, `workspaces`, `projects`, etc.
 
-1. Click on your app's URL in Railway
-2. You should see the Promptrix landing page
-3. Test the signup/login functionality
-4. Test creating prompts and A/B tests
+## 🌐 Step 4: Configure Domain
 
-## 🔧 Configuration Details
+### 4.1 Custom Domain (Optional)
+1. In your app service, go to "Settings" tab
+2. Click "Generate Domain" or add custom domain
+3. Update `NEXTAUTH_URL` with your domain
 
-### **Database Setup**
-- Railway automatically provides PostgreSQL
-- The `DATABASE_URL` is automatically set
-- No additional database configuration needed
+### 4.2 SSL Certificate
+Railway automatically provides SSL certificates for all domains.
 
-### **Environment Variables**
-- All variables are set in Railway dashboard
-- No `.env` files needed in production
-- Railway handles environment management
+## 📊 Step 5: Monitor & Debug
 
-### **Custom Domain (Optional)**
-1. Go to your app's "Settings" tab
-2. Click "Custom Domains"
-3. Add your domain and configure DNS
+### 5.1 Health Check
+Your app includes a health check endpoint: `/api/health`
+- Railway will use this for health monitoring
+- Check: `https://your-app.railway.app/api/health`
+
+### 5.2 Logs
+1. In Railway dashboard, click on your app service
+2. Go to "Deployments" tab
+3. Click on latest deployment to view logs
+
+### 5.3 Database Monitoring
+1. Click on PostgreSQL service
+2. View metrics, logs, and connection details
+3. Use "Query" tab for direct database access
 
 ## 🚨 Troubleshooting
 
-### **Common Issues:**
+### Common Issues
 
-1. **Build Fails**
-   - Check Railway logs for errors
-   - Ensure all dependencies are in `package.json`
-   - Verify Node.js version compatibility
-
-2. **Database Connection Issues**
-   - Verify `DATABASE_URL` is correct
-   - Check if database is provisioned
-   - Run `npx prisma db push` in Railway terminal
-
-3. **Environment Variables**
-   - Ensure all required variables are set
-   - Check variable names match exactly
-   - Restart deployment after adding variables
-
-4. **API Key Issues**
-   - Verify API keys are valid
-   - Check if keys have sufficient credits
-   - Test keys locally first
-
-### **Useful Commands:**
-
+#### 1. Database Connection Failed
 ```bash
-# Check deployment logs
-railway logs
-
-# Access Railway terminal
-railway shell
-
-# View environment variables
-railway variables
-
-# Restart deployment
-railway up
+# Check DATABASE_URL format
+# Ensure database is running
+# Verify network access
 ```
 
-## 📊 Monitoring
+#### 2. Migration Errors
+```bash
+# Reset database (WARNING: loses data)
+npx prisma migrate reset --force
 
-### **Railway Dashboard Features:**
-- **Real-time logs**: Monitor app performance
-- **Metrics**: CPU, memory, and network usage
-- **Deployments**: Track deployment history
-- **Variables**: Manage environment variables
-- **Domains**: Configure custom domains
+# Or push schema directly
+npx prisma db push
+```
 
-### **Health Checks:**
-- Railway automatically monitors your app
-- Automatic restarts on failures
-- Built-in load balancing
+#### 3. Build Failures
+```bash
+# Check Node.js version compatibility
+# Verify all dependencies are in package.json
+# Check for TypeScript errors
+```
+
+#### 4. App Won't Start
+```bash
+# Check startup logs
+# Verify start.sh permissions
+# Check environment variables
+```
+
+### Debug Commands
+```bash
+# Connect to Railway shell
+railway shell
+
+# Check environment variables
+env | grep DATABASE
+
+# Test database connection
+npx prisma db push --preview-feature
+
+# View app logs
+railway logs
+```
+
+## 🔄 Step 6: Continuous Deployment
+
+### 6.1 Automatic Deploys
+Railway automatically deploys when you push to your main branch.
+
+### 6.2 Manual Deploy
+```bash
+# Deploy manually
+railway up
+
+# Deploy specific branch
+railway up --branch feature-branch
+```
+
+### 6.3 Rollback
+1. Go to "Deployments" tab
+2. Click on previous deployment
+3. Click "Promote" to rollback
+
+## 📈 Step 7: Scaling
+
+### 7.1 Horizontal Scaling
+1. In app service settings
+2. Increase "Number of Replicas"
+3. Railway will automatically load balance
+
+### 7.2 Database Scaling
+1. In PostgreSQL service
+2. Upgrade to higher tier if needed
+3. Monitor connection limits
 
 ## 🔐 Security Best Practices
 
-1. **Environment Variables**
-   - Never commit API keys to Git
-   - Use Railway's variable management
-   - Rotate keys regularly
+### 7.1 Environment Variables
+- Never commit API keys to Git
+- Use Railway's encrypted variables
+- Rotate secrets regularly
 
-2. **Database Security**
-   - Railway handles database security
-   - Automatic backups included
-   - SSL connections enabled
+### 7.2 Database Security
+- Use strong passwords
+- Limit database access
+- Enable SSL connections
 
-3. **App Security**
-   - HTTPS automatically enabled
-   - Railway handles SSL certificates
-   - DDoS protection included
-
-## 💰 Cost Optimization
-
-### **Railway Pricing:**
-- **Free Tier**: $5 credit monthly
-- **Pro Plan**: $20/month for more resources
-- **Pay-as-you-go**: Only pay for what you use
-
-### **Cost Saving Tips:**
-1. Use free tier for development
-2. Scale down during low usage
-3. Monitor resource usage
-4. Use efficient Docker images
-
-## 🎉 Success!
-
-Once deployed, your Promptrix app will be available at:
-`https://your-app-name.railway.app`
-
-### **Next Steps:**
-1. Test all features thoroughly
-2. Set up monitoring alerts
-3. Configure custom domain (optional)
-4. Set up CI/CD for automatic deployments
+### 7.3 Application Security
+- Keep dependencies updated
+- Use HTTPS everywhere
+- Implement rate limiting
 
 ## 📞 Support
 
 - **Railway Docs**: [docs.railway.app](https://docs.railway.app)
 - **Railway Discord**: [discord.gg/railway](https://discord.gg/railway)
-- **GitHub Issues**: Report bugs in your repo
+- **GitHub Issues**: Report bugs in your repository
+
+## ✅ Deployment Checklist
+
+- [ ] PostgreSQL database created
+- [ ] Environment variables configured
+- [ ] Application deployed successfully
+- [ ] Database migrations completed
+- [ ] Health check endpoint working
+- [ ] Custom domain configured (optional)
+- [ ] SSL certificate active
+- [ ] Monitoring and logging set up
+- [ ] Backup strategy implemented
 
 ---
 
-**Happy Deploying! 🚀** 
+**Your Promptrix app should now be running on Railway with a PostgreSQL database!** 🎉 
