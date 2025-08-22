@@ -7,7 +7,7 @@ echo "Waiting for database to be ready..."
 echo "Checking database state..."
 npx prisma db push --accept-data-loss
 
-# Generate Prisma client
+# Generate Prisma client with proper configuration
 echo "Generating Prisma client..."
 npx prisma generate
 
@@ -26,6 +26,13 @@ if [ "$SEED_DATABASE" = "true" ]; then
     echo "Seeding database..."
     npx prisma db seed
 fi
+
+# Test Prisma connection before starting app
+echo "Testing Prisma connection..."
+npx prisma db execute --stdin <<< "SELECT 1" || {
+    echo "Prisma connection test failed"
+    exit 1
+}
 
 # Start the application
 echo "Starting application..."
