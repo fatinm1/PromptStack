@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth-provider'
 import { ThemeProvider } from '@/components/theme-provider'
+import { SessionProvider } from 'next-auth/react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -43,11 +44,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            <div className="min-h-screen bg-background">
-              {children}
-            </div>
-          </AuthProvider>
+          <SessionProvider>
+            <AuthProvider>
+              <div className="min-h-screen bg-background">
+                {children}
+              </div>
+            </AuthProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

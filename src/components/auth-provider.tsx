@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useSession, signIn, signOut, getSession } from 'next-auth/react'
 
 interface User {
   id: string
@@ -21,57 +22,45 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const checkAuth = async () => {
-      try {
-        // Get user ID from localStorage (simple session management)
-        const userId = localStorage.getItem('userId')
-        
-        if (userId) {
-          const response = await fetch('/api/auth/session', {
-            headers: {
-              'Authorization': `Bearer ${userId}`
-            }
-          })
-          if (response.ok) {
-            const session = await response.json()
-            if (session.user) {
-              setUser(session.user)
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error)
-      } finally {
-        setIsLoading(false)
-        setIsHydrated(true)
-      }
+    if (status === 'loading') {
+      setIsLoading(true)
+      return
     }
 
-    checkAuth()
-  }, [])
+    if (status === 'authenticated' && session?.user) {
+      setUser({
+        id: session.user.id || '',
+        name: session.user.name || '',
+        email: session.user.email || '',
+        avatar: session.user.image || undefined
+      })
+    } else {
+      setUser(null)
+    }
+
+    setIsLoading(false)
+    setIsHydrated(true)
+  }, [session, status])
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.user)
-        // Store user ID in localStorage for session management
-        localStorage.setItem('userId', data.user.id)
-      } else {
-        throw new Error('Login failed')
+      if (result?.error) {
+        throw new Error(result.error)
       }
+
+      // Session will be updated automatically by NextAuth
     } catch (error) {
       console.error('Login error:', error)
       throw error
@@ -89,7 +78,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json()
 
       if (response.ok) {
-        setUser(data.user)
+        // After successful signup, sign in automatically
+        await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        })
       } else {
         throw new Error(data.message || 'Signup failed')
       }
@@ -99,10 +93,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const logout = () => {
+  const logout = async () => {
+    await signOut({ redirect: false })
     setUser(null)
-    localStorage.removeItem('userId')
-    // In a real app, you'd call the logout API
   }
 
   return (
