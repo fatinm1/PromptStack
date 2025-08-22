@@ -1,4 +1,4 @@
-# Use Debian-based Node.js image for better Prisma compatibility
+# Use Node.js 18 with Debian slim base
 FROM node:18-slim AS base
 
 # Install system dependencies
@@ -7,22 +7,17 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies only when needed
+# Install dependencies
 FROM base AS deps
 WORKDIR /app
-
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
+COPY package*.json ./
 RUN npm ci
 
-# Rebuild the source code only when needed
+# Build the application
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Ensure public directory exists
-RUN mkdir -p public
 
 # Generate Prisma client
 RUN npx prisma generate
@@ -30,43 +25,35 @@ RUN npx prisma generate
 # Build the application
 RUN npm run build
 
-# Production image, copy all the files and run next
+# Production image
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# Create a non-root user
+RUN groupadd -r nextjs && useradd -r -g nextjs nextjs
 
-RUN groupadd --system --gid 1001 nodejs
-RUN useradd --system --uid 1001 nextjs
+# Copy the standalone output
+COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nextjs /app/public ./public
 
-COPY --from=builder /app/public ./public
+# Copy Prisma files
+COPY --from=builder --chown=nextjs:nextjs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nextjs /app/node_modules/.prisma ./node_modules/.prisma
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma files for database operations
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
-# Create a startup script that runs migrations before starting the app
-COPY --from=builder --chown=nextjs:nodejs /app/start.sh ./start.sh
+# Copy start script
+COPY start.sh ./
 RUN chmod +x start.sh
 
-# Use the startup script instead of directly starting the server
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 8080
+
+# Set environment variables
+ENV PORT=8080
+ENV HOSTNAME="0.0.0.0"
+
+# Start the application
 CMD ["./start.sh"]
