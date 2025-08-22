@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/components/auth-provider'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -14,19 +14,44 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { signup } = useAuth()
+  const [error, setError] = useState('')
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
 
     try {
-      await signup(name, email, password)
-      router.push('/dashboard')
+      // First, create the user account
+      const signupResponse = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      })
+
+      const signupData = await signupResponse.json()
+
+      if (!signupResponse.ok) {
+        throw new Error(signupData.message || 'Signup failed')
+      }
+
+      // Then, automatically sign in the user
+      const signInResult = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (signInResult?.error) {
+        setError('Account created but sign-in failed. Please try signing in.')
+      } else {
+        router.push('/dashboard')
+        router.refresh()
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Signup failed. Please try again.'
-      alert(errorMessage)
+      setError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -46,6 +71,11 @@ export default function SignUpPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                {error}
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium">Name</label>
               <Input
