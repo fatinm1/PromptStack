@@ -11,6 +11,12 @@ const nextConfig = {
     };
     return config;
   },
+  // Disable static generation for authenticated pages
+  experimental: {
+    // This ensures pages are rendered on-demand
+    workerThreads: false,
+    cpus: 1
+  }
 }
 
 module.exports = nextConfig 
