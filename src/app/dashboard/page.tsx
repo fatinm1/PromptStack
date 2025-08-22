@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/components/auth-provider'
+import { useNextAuth } from '@/hooks/use-nextauth'
 import { useRouter } from 'next/navigation'
 import { TypingAnimation } from '@/components/typing-animation'
 import { 
@@ -37,7 +37,7 @@ interface Analytics {
 }
 
 export default function DashboardPage() {
-  const { user, isHydrated } = useAuth()
+  const { user, isHydrated } = useNextAuth()
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
@@ -53,13 +53,10 @@ export default function DashboardPage() {
     try {
       setLoading(true)
       
-      // Get user ID from localStorage
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
-      
+      // Use NextAuth session for authentication
       const [projectsRes, analyticsRes] = await Promise.all([
-        fetch('/api/projects', { headers }),
-        fetch('/api/analytics', { headers })
+        fetch('/api/projects'),
+        fetch('/api/analytics')
       ])
 
       if (projectsRes.ok) {

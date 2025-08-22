@@ -4,45 +4,39 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useAuth } from '@/components/auth-provider'
+import { useNextAuth } from '@/hooks/use-nextauth'
 import { useRouter } from 'next/navigation'
 import { 
-  Users,
-  Plus,
-  UserPlus,
+  Users, 
+  Plus, 
+  Search, 
   Mail,
   Crown,
   Shield,
-  User,
-  Settings,
-  Trash2,
-  Search,
-  Filter,
-  Activity,
-  Calendar
+  UserPlus,
+  MoreVertical
 } from 'lucide-react'
 
 interface TeamMember {
   id: string
   name: string
   email: string
-  avatar: string
-  role: 'ADMIN' | 'MEMBER' | 'VIEWER'
-  status: 'active' | 'pending' | 'inactive'
+  role: string
+  avatar?: string
   joinedAt: string
   lastActive: string
-  projects: number
-  prompts: number
 }
 
 export default function TeamPage() {
-  const { user } = useAuth()
+  const { user } = useNextAuth()
   const router = useRouter()
-  const [members, setMembers] = useState<TeamMember[]>([])
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedRole, setSelectedRole] = useState('all')
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteMessage, setInviteMessage] = useState('')
+  const [inviting, setInviting] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -54,27 +48,10 @@ export default function TeamPage() {
     try {
       setLoading(true)
       
-      // Get user ID from localStorage
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
-      
-      const response = await fetch('/api/team', { headers })
+      const response = await fetch('/api/team')
       if (response.ok) {
         const data = await response.json()
-        // Transform the data to match the interface
-        const transformedMembers = data.members.map((member: any) => ({
-          id: member.user.id,
-          name: member.user.name,
-          email: member.user.email,
-          avatar: member.user.avatar || '',
-          role: member.role as 'ADMIN' | 'MEMBER' | 'VIEWER',
-          status: 'active' as const,
-          joinedAt: member.joinedAt,
-          lastActive: new Date().toISOString(),
-          projects: 0,
-          prompts: 0
-        }))
-        setMembers(transformedMembers)
+        setTeamMembers(data.members || [])
       }
     } catch (error) {
       console.error('Error fetching team members:', error)
@@ -90,7 +67,7 @@ export default function TeamPage() {
   const handleRemoveMember = async (id: string) => {
     if (confirm('Are you sure you want to remove this team member?')) {
       try {
-        setMembers(prev => prev.filter(member => member.id !== id))
+        setTeamMembers(prev => prev.filter(member => member.id !== id))
       } catch (error) {
         console.error('Error removing member:', error)
       }
@@ -99,8 +76,8 @@ export default function TeamPage() {
 
   const handleRoleChange = async (id: string, newRole: string) => {
     try {
-      setMembers(prev => prev.map(member => 
-        member.id === id ? { ...member, role: newRole as TeamMember['role'] } : member
+      setTeamMembers(prev => prev.map(member => 
+        member.id === id ? { ...member, role: newRole } : member
       ))
     } catch (error) {
       console.error('Error updating role:', error)
@@ -114,9 +91,9 @@ export default function TeamPage() {
       case 'MEMBER':
         return <Shield className="h-4 w-4 text-blue-500" />
       case 'VIEWER':
-        return <User className="h-4 w-4 text-gray-500" />
+        return <UserPlus className="h-4 w-4 text-gray-500" />
       default:
-        return <User className="h-4 w-4" />
+        return <UserPlus className="h-4 w-4" />
     }
   }
 
@@ -133,10 +110,10 @@ export default function TeamPage() {
     }
   }
 
-  const filteredMembers = members.filter(member => {
+  const filteredMembers = teamMembers.filter(member => {
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          member.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = selectedRole === 'all' || member.role === selectedRole
+    const matchesRole = true // No role filter in UI, so all members are shown
     return matchesSearch && matchesRole
   })
 
@@ -183,8 +160,8 @@ export default function TeamPage() {
           </div>
         </div>
         <select
-          value={selectedRole}
-          onChange={(e) => setSelectedRole(e.target.value)}
+          value="all" // No role filter in UI, so always "all"
+          onChange={(e) => {}}
           className="px-3 py-2 border border-input rounded-md bg-background"
         >
           <option value="all">All Roles</option>
@@ -193,7 +170,7 @@ export default function TeamPage() {
           <option value="VIEWER">Viewer</option>
         </select>
         <Button variant="outline" size="sm">
-          <Filter className="w-4 h-4 mr-2" />
+          <MoreVertical className="w-4 h-4 mr-2" />
           Filter
         </Button>
       </div>
@@ -249,12 +226,11 @@ export default function TeamPage() {
                             {member.role.toLowerCase()}
                           </span>
                         </div>
-                        <div className={`w-2 h-2 rounded-full ${getStatusColor(member.status)}`}></div>
+                        <div className={`w-2 h-2 rounded-full ${getStatusColor(member.role)}`}></div>
                       </div>
                       <p className="text-sm text-muted-foreground">{member.email}</p>
                       <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                        <span>{member.projects} projects</span>
-                        <span>{member.prompts} prompts</span>
+                        <span>{member.role === 'ADMIN' ? 'Full Access' : 'Limited Access'}</span>
                         <span>Joined {new Date(member.joinedAt).toLocaleDateString()}</span>
                       </div>
                     </div>
@@ -273,7 +249,7 @@ export default function TeamPage() {
                       <Mail className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm">
-                      <Settings className="h-4 w-4" />
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -281,7 +257,7 @@ export default function TeamPage() {
                       onClick={() => handleRemoveMember(member.id)}
                       className="text-red-600 hover:text-red-700"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -299,7 +275,7 @@ export default function TeamPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{members.length}</div>
+            <div className="text-2xl font-bold">{teamMembers.length}</div>
             <p className="text-xs text-muted-foreground">
               Team members
             </p>
@@ -309,14 +285,14 @@ export default function TeamPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Members</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+            <MoreVertical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {members.filter(m => m.status === 'active').length}
+              {teamMembers.filter(m => m.role === 'ADMIN').length}
             </div>
             <p className="text-xs text-muted-foreground">
-              Currently active
+              With full access
             </p>
           </CardContent>
         </Card>
@@ -328,7 +304,7 @@ export default function TeamPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {members.filter(m => m.status === 'pending').length}
+              {teamMembers.filter(m => m.role === 'VIEWER').length}
             </div>
             <p className="text-xs text-muted-foreground">
               Awaiting response
@@ -343,7 +319,7 @@ export default function TeamPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {members.filter(m => m.role === 'ADMIN').length}
+              {teamMembers.filter(m => m.role === 'ADMIN').length}
             </div>
             <p className="text-xs text-muted-foreground">
               With full access

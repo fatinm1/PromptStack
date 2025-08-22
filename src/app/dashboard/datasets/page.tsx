@@ -4,21 +4,15 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useAuth } from '@/components/auth-provider'
+import { useNextAuth } from '@/hooks/use-nextauth'
 import { useRouter } from 'next/navigation'
 import { 
-  Database,
-  Plus,
-  Upload,
-  Download,
-  Trash2,
-  Eye,
-  Edit,
-  Search,
-  Filter,
-  FileText,
-  Users,
-  Calendar
+  Database, 
+  Plus, 
+  Search, 
+  MoreVertical,
+  Calendar,
+  Tag
 } from 'lucide-react'
 
 interface Dataset {
@@ -34,7 +28,7 @@ interface Dataset {
 }
 
 export default function DatasetsPage() {
-  const { user } = useAuth()
+  const { user } = useNextAuth()
   const router = useRouter()
   const [datasets, setDatasets] = useState<Dataset[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,11 +45,7 @@ export default function DatasetsPage() {
     try {
       setLoading(true)
       
-      // Get user ID from localStorage
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
-      
-      const response = await fetch('/api/datasets', { headers })
+      const response = await fetch('/api/datasets')
       if (response.ok) {
         const data = await response.json()
         // Transform the data to match the interface

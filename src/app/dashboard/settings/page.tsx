@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { useAuth } from '@/components/auth-provider'
+import { useNextAuth } from '@/hooks/use-nextauth'
 import { useRouter } from 'next/navigation'
 import { 
   Settings,
@@ -48,7 +48,7 @@ interface UserSettings {
 }
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user } = useNextAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

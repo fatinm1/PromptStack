@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/components/auth-provider'
+import { useNextAuth } from '@/hooks/use-nextauth'
 import { useRouter } from 'next/navigation'
 import { 
   BarChart3, 
@@ -42,7 +42,7 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsPage() {
-  const { user } = useAuth()
+  const { user } = useNextAuth()
   const router = useRouter()
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -58,11 +58,7 @@ export default function AnalyticsPage() {
     try {
       setLoading(true)
       
-      // Get user ID from localStorage
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
-      
-      const response = await fetch(`/api/analytics?range=${timeRange}`, { headers })
+      const response = await fetch(`/api/analytics?range=${timeRange}`)
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data)
