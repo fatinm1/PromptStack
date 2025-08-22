@@ -5,8 +5,6 @@ generator client {
   provider = "prisma-client-js"
   // Add explicit configuration to avoid constructor issues
   previewFeatures = []
-  // Use a more stable client version
-  engineType = "library"
 }
 
 datasource db {
