@@ -12,7 +12,12 @@ import {
   Search, 
   MoreVertical,
   Calendar,
-  Tag
+  Tag,
+  Upload,
+  Filter,
+  Eye,
+  Edit,
+  Trash2
 } from 'lucide-react'
 
 interface Dataset {
@@ -84,8 +89,12 @@ export default function DatasetsPage() {
   const handleDeleteDataset = async (id: string) => {
     if (confirm('Are you sure you want to delete this dataset?')) {
       try {
-        // In a real app, you'd call the delete API
-        setDatasets(prev => prev.filter(dataset => dataset.id !== id))
+        const response = await fetch(`/api/datasets/${id}`, {
+          method: 'DELETE'
+        })
+        if (response.ok) {
+          setDatasets(prev => prev.filter(dataset => dataset.id !== id))
+        }
       } catch (error) {
         console.error('Error deleting dataset:', error)
       }
@@ -179,7 +188,7 @@ export default function DatasetsPage() {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Create your first dataset to start testing your prompts with real data. Datasets help you evaluate prompt performance across multiple test cases.
             </p>
-            <Button className="bg-gradient-to-r from-promptrix-primary to-promptrix-secondary" onClick={handleCreateDataset}>
+            <Button onClick={handleCreateDataset}>
               <Plus className="mr-2 h-4 w-4" />
               Create Your First Dataset
             </Button>
@@ -226,101 +235,31 @@ export default function DatasetsPage() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Items</span>
-                    <span className="font-medium">{dataset.itemCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Project</span>
+                    <span className="text-muted-foreground">Project:</span>
                     <span className="font-medium">{dataset.projectName}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Updated</span>
+                    <span className="text-muted-foreground">Items:</span>
+                    <span className="font-medium">{dataset.itemCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Created:</span>
+                    <span className="font-medium">
+                      {new Date(dataset.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Updated:</span>
                     <span className="font-medium">
                       {new Date(dataset.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
-                  {dataset.tags && dataset.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {dataset.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 bg-muted text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Datasets</CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{datasets.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Across all projects
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {datasets.reduce((sum, dataset) => sum + dataset.itemCount, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Test data points
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {new Set(datasets.map(d => d.projectId)).size}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              With datasets
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Last Updated</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {datasets.length > 0 
-                ? new Date(Math.max(...datasets.map(d => new Date(d.updatedAt).getTime()))).toLocaleDateString()
-                : 'Never'
-              }
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Most recent change
-            </p>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   )
 } 
