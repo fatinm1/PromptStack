@@ -18,6 +18,10 @@ echo "Setting up database schema..."
 # Clean up any existing Prisma client
 rm -rf node_modules/.prisma
 
+# Force reinstall Prisma to ensure correct version
+echo "Ensuring correct Prisma version..."
+npm install prisma@5.7.1 @prisma/client@5.7.1
+
 # Generate Prisma client with explicit options
 echo "Generating Prisma client..."
 npx prisma generate

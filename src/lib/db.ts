@@ -12,18 +12,24 @@ export function getPrismaClient(): PrismaClient {
       throw new Error('DATABASE_URL environment variable is not set')
     }
     
-    _prisma = new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-      errorFormat: 'pretty',
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL
+    try {
+      _prisma = new PrismaClient({
+        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+        errorFormat: 'pretty',
+        // Explicitly set all required fields to avoid constructor issues
+        datasources: {
+          db: {
+            url: process.env.DATABASE_URL
+          }
         }
+      })
+      
+      if (process.env.NODE_ENV !== 'production') {
+        globalForPrisma.prisma = _prisma
       }
-    })
-    
-    if (process.env.NODE_ENV !== 'production') {
-      globalForPrisma.prisma = _prisma
+    } catch (error) {
+      console.error('Failed to create Prisma client:', error)
+      throw new Error(`Prisma client initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
   
@@ -37,7 +43,17 @@ export const prisma = new Proxy({} as PrismaClient, {
     if (typeof process === 'undefined' || !process.env?.DATABASE_URL) {
       return () => Promise.resolve(null)
     }
-    return getPrismaClient()[prop as keyof PrismaClient]
+    
+    try {
+      return getPrismaClient()[prop as keyof PrismaClient]
+    } catch (error) {
+      console.error('Prisma client access error:', error)
+      // Return a mock function that logs the error
+      return () => {
+        console.error('Prisma client not available:', error)
+        return Promise.resolve(null)
+      }
+    }
   }
 })
 
