@@ -1,4 +1,4 @@
-## PromptStack (Promptrix)
+## PromptStack 
 
 PromptStack is a Next.js + Prisma platform for managing, versioning, testing, and collaborating on LLM prompts and evaluation workflows (think “GitHub for prompts”).
 
