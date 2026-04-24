@@ -1,153 +1,163 @@
-# Promptrix - GitHub for LLM Prompts & Workflows
+## PromptStack (Promptrix)
 
-A comprehensive platform for managing, versioning, testing, and deploying LLM prompts with team collaboration features.
+PromptStack is a Next.js + Prisma platform for managing, versioning, testing, and collaborating on LLM prompts and evaluation workflows (think “GitHub for prompts”).
 
-## 🚀 Quick Start
+## Features
 
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- Git
+- **Prompt versioning**: prompt history with tracked changes
+- **A/B testing**: compare prompt variants and capture results
+- **Workspaces & roles**: organize teams and projects with access control
+- **Datasets & test runs**: batch evaluation on curated inputs
+- **Analytics**: performance, latency, and cost visibility
+- **Multi-model**: bring your own provider keys (OpenAI, Anthropic, and more)
 
-### Installation
+## Tech stack
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/fatinm1/Promptrix.git
-   cd Promptrix
-   ```
+- **App**: Next.js 14 (App Router), React 18, TypeScript
+- **UI**: Tailwind CSS, shadcn/ui, Radix UI, Framer Motion
+- **Auth**: NextAuth.js + Prisma adapter
+- **DB**: PostgreSQL (primary), Prisma ORM
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+## Requirements
 
-3. **Set up environment variables**
-   ```bash
-   cp env.example .env.local
-   ```
-   
-   Update `.env.local` with your configuration:
-   ```env
-   DATABASE_URL="file:./dev.db"
-   NEXTAUTH_URL="http://localhost:3000"
-   NEXTAUTH_SECRET="your-secret-key-here"
-   OPENAI_API_KEY="your-openai-api-key"
-   ANTHROPIC_API_KEY="your-anthropic-api-key"
-   ```
+- **Node.js**: 18+ (recommended: latest 20 LTS)
+- **Package manager**: npm
+- **Database**: PostgreSQL (local or hosted)
 
-4. **Set up the database**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   npx prisma db seed
-   ```
+## Quick start (local development)
 
-5. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+### 1) Install dependencies
 
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 🧪 Test Account
-
-For development and testing, you can use the following test account:
-
-- **Email:** `test@example.com`
-- **Password:** `test123`
-
-This account comes with sample data including:
-- 1 workspace
-- 1 project with sample prompts
-- 1 dataset with test items
-- Sample test runs and analytics data
-
-## 🎯 Features
-
-### Core Functionality
-- **Prompt Versioning**: Git-like version control for prompts
-- **A/B Testing**: Compare prompt versions with statistical analysis
-- **Real-time Collaboration**: Team editing with live cursors
-- **Cost Tracking**: Monitor token usage and costs
-- **Analytics Dashboard**: Performance metrics and insights
-
-### Team Features
-- **Workspace Management**: Organize projects by workspace
-- **Role-based Access**: Owner, Admin, and Member roles
-- **Activity Tracking**: Monitor team activity and changes
-- **Approval Workflows**: Review and approve prompt changes
-
-### AI Integration
-- **Multi-Model Support**: GPT-4, GPT-3.5, Claude, and more
-- **Real-time Testing**: Test prompts instantly
-- **Batch Processing**: Run tests on datasets
-- **Performance Monitoring**: Track latency and success rates
-
-## 🛠 Tech Stack
-
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui components
-- **Database**: SQLite (development), PostgreSQL (production)
-- **ORM**: Prisma
-- **Authentication**: NextAuth.js
-- **AI APIs**: OpenAI, Anthropic
-- **State Management**: Zustand
-- **Animations**: Framer Motion
-- **Code Editor**: Monaco Editor
-
-## 📁 Project Structure
-
+```bash
+npm install
 ```
+
+### 2) Configure environment variables
+
+Copy the example file and edit values:
+
+```bash
+cp env.example .env.local
+```
+
+At minimum you should set:
+
+```bash
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/promptrix"
+
+# Auth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="replace-with-a-long-random-secret"
+
+# LLM providers (set what you use)
+OPENAI_API_KEY="..."
+ANTHROPIC_API_KEY="..."
+```
+
+### 3) Initialize database + Prisma client
+
+```bash
+npm run db:generate
+npm run db:push
+npm run db:seed
+```
+
+### 4) Run the app
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+## Useful scripts
+
+- **Dev**: `npm run dev`
+- **Build**: `npm run build`
+- **Start**: `npm run start`
+- **Lint**: `npm run lint`
+- **Typecheck**: `npm run type-check`
+- **Prisma generate**: `npm run db:generate`
+- **Push schema**: `npm run db:push`
+- **Run migrations (prod)**: `npm run db:migrate`
+- **Seed database**: `npm run db:seed`
+- **Prisma Studio**: `npm run db:studio`
+
+## Health check
+
+The application exposes a health endpoint at `GET /api/health`.
+
+- **200**: database reachable (`database: "connected"`)
+- **503**: database not reachable / misconfigured
+
+This is intended for deployment health checks (e.g. Railway).
+
+## Deployment
+
+This repo includes Railway-oriented docs and examples:
+
+- **Guide**: `DEPLOYMENT.md`
+- **Railway env example**: `env.railway`
+
+Typical production requirements:
+
+- **Set** `DATABASE_URL`, `NEXTAUTH_URL`, and `NEXTAUTH_SECRET`
+- **Run** `prisma generate` during build and `prisma migrate deploy` (or `db push`) at release time
+- **Ensure** the health check can reach the database from the runtime environment
+
+## Troubleshooting
+
+### Prisma build error: “Invalid value undefined for datasource `db`”
+
+If `next build` fails with a Prisma error about datasource URL, it usually means **`DATABASE_URL` is missing at build time**.
+
+- **Fix**: provide `DATABASE_URL` in your build environment (CI/Railway build variables), or ensure Prisma is not instantiated during build-time code paths.
+
+### Runtime panic: “missing field `enableTracing`”
+
+This typically indicates a **Prisma engine/client version mismatch** (e.g. generating with Prisma v6 but running `@prisma/client` v5, or mixed cached engines).
+
+- **Fix**: ensure `prisma` and `@prisma/client` versions match, reinstall dependencies, and regenerate the client:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+npm run db:generate
+```
+
+### `npm ci` fails: “package-lock.json not in sync”
+
+`npm ci` requires `package.json` and `package-lock.json` to match exactly.
+
+- **Fix**: run `npm install` locally to update the lock file, commit the updated `package-lock.json`, then redeploy.
+
+### `EACCES` when npm tries to write under `/home/nextjs`
+
+In some container environments, npm cache/log paths may not be writable by the running user.
+
+- **Fix**: set `npm_config_cache` to a writable directory (for example `/tmp/.npm`) or adjust the container user/permissions.
+
+## Project structure
+
+```text
 src/
-├── app/                    # Next.js App Router
-│   ├── api/               # API routes
-│   ├── auth/              # Authentication pages
-│   ├── dashboard/         # Dashboard pages
-│   └── globals.css        # Global styles
-├── components/            # Reusable components
-│   ├── ui/               # shadcn/ui components
-│   └── dashboard/        # Dashboard-specific components
-├── lib/                  # Utility functions
-├── store/                # Zustand stores
-└── types/                # TypeScript types
+  app/                 Next.js App Router (pages + API routes)
+  components/          Reusable UI components
+  lib/                 Server/client utilities (db, auth, helpers)
+  store/               Zustand stores
+  types/               Shared TypeScript types
+prisma/
+  schema.prisma        Prisma data model
+  seed.ts              Seed script
 ```
 
-## 🔧 Development
+## Contributing
 
-### Available Scripts
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript checks
+- Create a feature branch from `main`
+- Keep PRs focused and include a short test plan
+- Run `npm run lint` and `npm run type-check` before opening a PR
 
-### Database Commands
-- `npx prisma studio` - Open database GUI
-- `npx prisma db push` - Push schema changes
-- `npx prisma db seed` - Seed with sample data
-- `npx prisma generate` - Generate Prisma client
+## License
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-- Open an issue on GitHub
-- Check the documentation
-- Join our community discussions
-
----
-
-**Promptrix** - Building the future of AI prompt engineering, one version at a time. 🚀 
+MIT. See `LICENSE`.
