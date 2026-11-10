@@ -1,16 +1,14 @@
+import { requestUserId } from '@/lib/request-identity'
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
     // Get the user ID from the Authorization header
-    const authHeader = request.headers.get('authorization')
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ workspaces: [] })
+    const userId = await requestUserId()
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const userId = authHeader.replace('Bearer ', '')
     
     // Verify the user exists
     const user = await prisma.user.findUnique({

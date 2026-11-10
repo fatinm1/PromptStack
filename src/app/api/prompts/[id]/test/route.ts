@@ -1,3 +1,4 @@
+import { requestUserId } from '@/lib/request-identity'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import prisma from '@/lib/db'
@@ -19,11 +20,10 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const userId = await requestUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const userId = authHeader.replace('Bearer ', '')
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -141,11 +141,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const userId = await requestUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const userId = authHeader.replace('Bearer ', '')
     const user = await prisma.user.findUnique({ 
       where: { id: userId },
       select: { id: true, email: true, name: true }

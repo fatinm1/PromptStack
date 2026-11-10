@@ -30,8 +30,8 @@ export default function ABTestingPage() {
       setLoading(true)
       
       // Get user ID from localStorage
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch('/api/ab-tests', { headers })
       if (response.ok) {
@@ -57,8 +57,8 @@ export default function ABTestingPage() {
 
     setIsRunning(true)
     try {
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch(`/api/ab-tests/${selectedTest}/run`, {
         method: 'POST',

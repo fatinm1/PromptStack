@@ -76,7 +76,7 @@ export default function PromptTestPage({ params }: { params: { id: string } }) {
       setLoading(true)
       const response = await fetch(`/api/prompts/${params.id}`, {
         headers: {
-          'Authorization': `Bearer ${user?.id}`
+
         }
       })
       
@@ -98,7 +98,7 @@ export default function PromptTestPage({ params }: { params: { id: string } }) {
     try {
       const response = await fetch(`/api/prompts/${params.id}/test-runs`, {
         headers: {
-          'Authorization': `Bearer ${user?.id}`
+
         }
       })
       
@@ -155,7 +155,7 @@ export default function PromptTestPage({ params }: { params: { id: string } }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.id}`
+
         },
         body: JSON.stringify({
           input: inputData,

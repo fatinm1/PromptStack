@@ -30,8 +30,8 @@ export default function PromptsPage() {
         setLoading(true)
         
         // Get user ID from localStorage
-        const userId = localStorage.getItem('userId')
-        const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+        const headers: Record<string, string> = {}
         
         const response = await fetch('/api/prompts', { headers })
         if (response.ok) {

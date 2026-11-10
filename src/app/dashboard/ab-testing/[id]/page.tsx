@@ -61,8 +61,8 @@ export default function ABTestDetailPage({ params }: { params: { id: string } })
   const fetchTestDetails = async () => {
     try {
       setLoading(true)
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch(`/api/ab-tests/${params.id}/results`, { headers })
       if (response.ok) {
@@ -86,8 +86,8 @@ export default function ABTestDetailPage({ params }: { params: { id: string } })
 
     setRunning(true)
     try {
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch(`/api/ab-tests/${params.id}/run`, {
         method: 'POST',

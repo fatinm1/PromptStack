@@ -1,3 +1,4 @@
+import { requestUserId } from '@/lib/request-identity'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { z } from 'zod'
@@ -23,17 +24,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Try to get user ID from Bearer token first
-    let userId: string | null = null
-    const authHeader = request.headers.get('authorization')
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      userId = authHeader.replace('Bearer ', '')
-    } else {
-      // Fall back to NextAuth session
-      const session = await getServerSession(authOptions)
-      userId = session?.user?.id || null
-    }
+    const userId = await requestUserId()
 
     if (!userId) {
       return NextResponse.json(

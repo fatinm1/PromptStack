@@ -38,8 +38,8 @@ export default function CreateABTestPage() {
 
   const fetchPrompts = async () => {
     try {
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch('/api/prompts', { headers })
       if (response.ok) {
@@ -59,11 +59,8 @@ export default function CreateABTestPage() {
 
     setLoading(true)
     try {
-      const userId = localStorage.getItem('userId')
+
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-      if (userId) {
-        headers['Authorization'] = `Bearer ${userId}`
-      }
       
       const response = await fetch('/api/ab-tests', {
         method: 'POST',

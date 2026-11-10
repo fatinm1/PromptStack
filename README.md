@@ -161,3 +161,7 @@ prisma/
 ## License
 
 MIT. See `LICENSE`.
+
+## Authentication and workspace isolation
+
+Sign in through the NextAuth credentials page. API routes resolve identity from the verified HttpOnly session; arbitrary Bearer user IDs and localStorage IDs are not credentials. Set a unique NEXTAUTH_SECRET in production. Requested workspace filters are intersected with authenticated memberships. Run the security tests before changing these boundaries.
