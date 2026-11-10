@@ -1,3 +1,4 @@
+import { requestUserId, workspaceScope } from '@/lib/request-identity'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import prisma from '@/lib/db'
@@ -14,11 +15,10 @@ const createABTestSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ abTests: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
+    const userId = await requestUserId()
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const userId = authHeader.replace('Bearer ', '')
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
       return NextResponse.json({ abTests: [], pagination: { page: 1, limit: 10, total: 0, pages: 0 } })
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 
     // Build where clause
     const where: any = {
-      OR: [
+      AND: [
         {
           promptA: {
             project: {
@@ -60,15 +60,15 @@ export async function GET(request: NextRequest) {
     }
 
     if (workspaceId) {
-      where.OR = [
+      where.AND = [
         {
           promptA: {
-            project: { workspaceId }
+            project: { workspaceId: workspaceScope(workspaceIds, workspaceId) }
           }
         },
         {
           promptB: {
-            project: { workspaceId }
+            project: { workspaceId: workspaceScope(workspaceIds, workspaceId) }
           }
         }
       ]
@@ -130,11 +130,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const userId = await requestUserId()
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const userId = authHeader.replace('Bearer ', '')
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })

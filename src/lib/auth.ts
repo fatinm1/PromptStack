@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET is required in production')
+}
+
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
@@ -117,6 +121,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/signin'
   },
-  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development-only',
-  debug: true, // Enable debug mode to see what's happening
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV !== 'production',
 } 

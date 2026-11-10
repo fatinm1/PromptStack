@@ -44,8 +44,8 @@ export default function CreateProjectPage() {
   useEffect(() => {
     const loadWorkspaces = async () => {
       try {
-        const userId = localStorage.getItem('userId')
-        const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+        const headers: Record<string, string> = {}
         
         const response = await fetch('/api/workspaces', { headers })
         if (response.ok) {
@@ -79,8 +79,8 @@ export default function CreateProjectPage() {
 
     try {
       setSaving(true)
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch('/api/projects', {
         method: 'POST',

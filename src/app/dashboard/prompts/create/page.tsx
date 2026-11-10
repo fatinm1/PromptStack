@@ -55,8 +55,8 @@ export default function CreatePromptPage() {
 
   const loadProjects = async () => {
     try {
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch('/api/projects', { headers })
       if (response.ok) {
@@ -81,8 +81,8 @@ export default function CreatePromptPage() {
 
     try {
       setSaving(true)
-      const userId = localStorage.getItem('userId')
-      const headers: Record<string, string> = userId ? { 'Authorization': `Bearer ${userId}` } : {}
+
+      const headers: Record<string, string> = {}
       
       const response = await fetch('/api/prompts', {
         method: 'POST',
